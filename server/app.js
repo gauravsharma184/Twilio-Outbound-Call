@@ -16,6 +16,8 @@ const bodyParser = require('body-parser')
 
 
 
+app.use(express.static('client'));
+
 app.use(cors());
 
 app.use(bodyParser.json());
