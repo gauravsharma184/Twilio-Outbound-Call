@@ -41,7 +41,7 @@ const createCallHandler = (req, res) => {
 
         async function createCall() {
             const call = await client.calls.create({
-                from: "+17342513817",
+                from: process.env.TWILIO_PHONE_NUMBER,
 
                 statusCallback: "https://nominatively-atomistic-lacresha.ngrok-free.dev/webhook",
                 statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
