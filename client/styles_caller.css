@@ -1,0 +1,209 @@
+/* Reset & base styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  body {
+    background-color: #f4f6f8;
+    min-height: 100vh;
+  }
+  
+  /* Navigation bar */
+  .navigationBar {
+    width: 100%;
+    padding: 12px 20px;
+    background-color: #1f2933;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
+  .navigationBar button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .navigationBar button:hover {
+    background-color: #2563eb;
+  }
+
+  .navigationBar #Verify {
+      margin-left: 20px;
+  }
+  
+  /* Main container */
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 16px;
+  }
+  
+  /* Form styling */
+  #outboundCall {
+    background-color: #ffffff;
+    padding: 24px 28px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  }
+  
+  #outboundCall p {
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #374151;
+  }
+  
+  /* Phone input */
+  #phone {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    margin-bottom: 20px;
+  }
+  
+  #phone:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  
+  /* Buttons container */
+  .funtion {
+    display: flex;
+    gap: 12px;
+  }
+  
+  /* Common button styles */
+  .funtion button {
+    flex: 1;
+    padding: 10px 0;
+    font-size: 15px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  /* Make Call button */
+  .funtion button:first-child {
+    background-color: #10b981;
+    color: white;
+    margin-top: 10px;
+  }
+  
+  .funtion button:first-child:hover {
+    background-color: #059669;
+
+  }
+  
+  /* End Call button */
+  .funtion button:last-child {
+    background-color: #ef4444;
+    color: white;
+    margin-top: 10px;
+  }
+  
+  .funtion button:last-child:hover {
+    background-color: #dc2626;
+  }
+
+
+/* Intl Tel Input wrapper */
+.iti {
+  width: 100%;
+}
+
+/* Phone input field */
+.iti input[type="tel"] {
+  width: 100%;
+  padding: 12px 14px 12px 64px; /* 👈 key fix */
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
+}
+
+/* Focus state */
+.iti input[type="tel"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* Flag container positioning */
+.iti__flag-container {
+  left: 12px;
+}
+
+/* Override intl-tel-input defaults */
+.iti--allow-dropdown input,
+.iti--separate-dial-code input {
+  padding-left: 64px !important;
+}
+
+
+
+
+
+
+  /* Alert base */
+.alert {
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+    display: none;
+  }
+  
+  /* Info (default / calling) */
+  .alert-info {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #7dd3fc;
+    text-align: center;
+    
+    
+  }
+  
+  /* Success (connected) */
+  .alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+    text-align: center;
+  }
+  
+  /* Error (failed) */
+  .alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    text-align: center;
+
+  }
+  
+  /* Smooth appearance */
+
+  
+  
+  
+  
+
+
+  
+  
+  

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <title>OutboundCaller</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <link rel="stylesheet" href="styles_caller.css" />
+   <link
+     rel="stylesheet"
+     href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"
+   />
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+
+ </head>
+ <body>
+    <div class="navigationBar">
+        <span>
+            <a href='./logs.html'><button>Call Logs</button></a>
+        </span>
+
+        <!-- <span>
+          <button id="Verify">Verify</button>
+        <span> -->
+
+    </div>
+    <div class="container">
+        <div id="outboundCall" >
+          <p>Enter the phone number:</p>
+          <input id="phone" type="tel" name="phone" />
+
+          <div class="alert alert-info" style="display: none;"></div>
+          <div class="funtion">
+            <button id="MakeCall" type="button">Make Call</button>
+            <button id="EndCall" type="button">End Call</button> 
+          </div>
+          
+        </div>
+       </div>
+       
+ </body>
+ <script src="caller.js"></script>
+</html>
