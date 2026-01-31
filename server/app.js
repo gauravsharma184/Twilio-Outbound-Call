@@ -12,15 +12,27 @@ const PORT = 3000;
 
 const bodyParser = require('body-parser')
 
+const path = require('path');
 
 
 
 
-app.use(express.static('client'));
+
+
+
+
+
+
 
 app.use(cors());
 
 app.use(bodyParser.json());
+
+app.use(express.static(path.join(__dirname,'../client')));
+
+app.get('/',(req, res) => {
+    return res.sendFile(path.join(__dirname,'../client','caller.html'));
+})
 
 
 app.get('/events',eventHandler)
