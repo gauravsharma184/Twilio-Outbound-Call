@@ -6,7 +6,7 @@ const cors = require('cors');
 
 const { createCallHandler, statusCallbackEventHandler, endcallHandler,validPhoneNumberHandler,eventHandler } = require('./controllers/call.js');
 
-const {validEmailHandler,createAccountHandler} = require('./controllers/authenticaton.js')
+const {validEmailHandler,createAccountHandler,isValidCredentialsHandler,createJWTHandler,} = require('./controllers/authenticaton.js')
 
 const app = express();
 
@@ -53,7 +53,9 @@ app.post('/makecall',validPhoneNumberHandler, createCallHandler);
 app.put('/endcall',endcallHandler)
 
 
-app.get('/signup',createAccountHandler);
+app.post('/signup',createAccountHandler);
+
+app.get('/login',isValidCredentialsHandler,createJWTHandler);
 
 
 

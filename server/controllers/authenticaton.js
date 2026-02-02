@@ -76,9 +76,10 @@ const createAccountHandler = async (req, res, next) => {
 
 
 
-const createJWTHandler = (req, res) => {
+const createJWTHandler = async (req, res) => {
     const email = req.body.Email;
-    const id = getUserId(email);
+    const id = await getUserId(email);
+    console.log(id);
     const payload = {};
     const key = process.env.JWT_SYMMETRIC_KEY;
     const config = {
@@ -123,7 +124,8 @@ const isValidCredentialsHandler = async (req, res, next) => {
 module.exports = {
     validEmailHandler,
     createAccountHandler,
-    createJWTHandler
+    createJWTHandler,
+    isValidCredentialsHandler
 }
 
 

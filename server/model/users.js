@@ -67,7 +67,7 @@ async function isValidCredentials(email,password){
         const values = [email];
         const result = await client.query(query, values)
 
-        console.log(result);
+        // console.log(result);
 
         client.release();
 
@@ -95,9 +95,11 @@ async function getUserId(email){
 
         console.log(result);
 
+        client.release();
+
         return result.rows[0].user_id;
 
-        client.release();
+        
     } catch(err){
         console.log(err);
     }
