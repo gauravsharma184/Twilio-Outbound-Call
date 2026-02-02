@@ -4,7 +4,9 @@ const express = require('express');
 
 const cors = require('cors');
 
-const { createCallHandler, statusCallbackEventHandler, endcallHandler,validPhoneNumberHandler,eventHandler } = require('./controllers');
+const { createCallHandler, statusCallbackEventHandler, endcallHandler,validPhoneNumberHandler,eventHandler } = require('./controllers/call.js');
+
+const {validEmailHandler,createAccountHandler} = require('./controllers/authenticaton.js')
 
 const app = express();
 
@@ -27,6 +29,7 @@ const path = require('path');
 app.use(cors());
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
 
 app.use(express.static(path.join(__dirname,'../client')));
 
@@ -48,6 +51,9 @@ app.post('/makecall',validPhoneNumberHandler, createCallHandler);
 
 
 app.put('/endcall',endcallHandler)
+
+
+app.get('/signup',createAccountHandler);
 
 
 

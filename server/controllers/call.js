@@ -14,7 +14,7 @@ const client = twilio(accountSid, authToken);
 const bodyParser = require('body-parser');
 
 
-const { insertCallDB, updateCallDB, getSidDB } = require('./model');
+const { insertCallDB, updateCallDB, getSidDB } = require('../model/call_logs.js');
 
 
 const validPhoneNumberHandler = async (req, res, next) => {
