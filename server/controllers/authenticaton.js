@@ -3,7 +3,7 @@ require('dotenv').config();
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
-const { checkUnique, insertUser } = require('../model/users');
+const { checkUnique, insertUser, getUserId, isValidCredentials } = require('../model/users');
 
 
 
@@ -65,7 +65,10 @@ const createAccountHandler = async (req, res, next) => {
         })
     }
 
-    next();
+    // res.redirect('/login');
+
+    return res.send(); // first signup will happen then the user will be redirected to the login page and when the 
+    //user enters his email and password , we verify its credentials and then we create a jwt token and send him to the dialer
 
 
 }
@@ -74,14 +77,41 @@ const createAccountHandler = async (req, res, next) => {
 
 
 const createJWTHandler = (req, res) => {
+    const email = req.body.Email;
+    const id = getUserId(email);
     const payload = {};
     const key = process.env.JWT_SYMMETRIC_KEY;
     const config = {
         expiresIn : 60 * 60,
     }
     jwt.sign(payload,key,config,function(err, token) {
+        if(err){
+            return res.status(500).send(err.name);
+        }
         console.log(token);
+        return res.json({
+            status: "success",
+            message: "authenticaiton successful",
+            token: token,
+            user_id: id
+        })
     })
+}
+
+const isValidCredentialsHandler = async (req, res, next) => {
+    const email = req.body.Email;
+    const password = req.body.Password;
+
+    const isValid = await isValidCredentials(email,password);
+
+    if(!isValid){
+        return res.json({
+            message: "Invalid Credentials",
+        })
+    }
+
+
+    next();
 }
 
 
