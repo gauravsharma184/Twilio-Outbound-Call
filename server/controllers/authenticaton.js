@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
 
 const { checkUnique, insertUser } = require('../model/users');
 
@@ -48,7 +49,7 @@ const validEmailHandler = async (req, res, next) => {
 
 }
 
-const createAccountHandler = async (req, res) => {
+const createAccountHandler = async (req, res, next) => {
     const email = req.body.Email;
     const password = req.body.Password;
 
@@ -58,37 +59,33 @@ const createAccountHandler = async (req, res) => {
         await insertUser(email,password);
     }
 
-    return res.json({
-        status: checkForUniqueEmail,
-    })
-
-
-}
-
-async function isValidCredentials(email,password){
-    try{
-        const client = await pool.connect();
-        const query = 'SELECT * FROM users WHERE email_id = $1';
-        const values = [email];
-        const result = await client.query(query, values)
-
-        console.log(result);
-
-        client.release();
-
-        const hash = result.rows[0].password;
-
-        console.log(hash);
-        
-
-
-        const isValid = bcrypt.compare(password,hash);
-
-        return isValid;
-    } catch(err){
-        console.log(err);
+    else {
+        return res.json({
+            status:'user already exists'
+        })
     }
+
+    next();
+
+
 }
+
+
+
+
+const createJWTHandler = (req, res) => {
+    const payload = {};
+    const key = process.env.JWT_SYMMETRIC_KEY;
+    const config = {
+        expiresIn : 60 * 60,
+    }
+    jwt.sign(payload,key,config,function(err, token) {
+        console.log(token);
+    })
+}
+
+
+
 
 
 
@@ -96,7 +93,7 @@ async function isValidCredentials(email,password){
 module.exports = {
     validEmailHandler,
     createAccountHandler,
-    isValidCredentials
+    createJWTHandler
 }
 
 
