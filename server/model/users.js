@@ -27,9 +27,7 @@ async function checkUnique(email) {
         // console.log(result);
         console.log(numberOfRows);
 
-        if(numberOfRows === 0) return true;
-
-        return false;
+        return numberOfRows === 0;
 
         
 
@@ -62,10 +60,55 @@ async function insertUser(email, password){
     }
 }
 
+async function isValidCredentials(email,password){
+    try{
+        const client = await pool.connect();
+        const query = 'SELECT * FROM users WHERE email_id = $1';
+        const values = [email];
+        const result = await client.query(query, values)
+
+        console.log(result);
+
+        client.release();
+
+        const hash = result.rows[0].password;
+
+        console.log(hash);
+        
+
+
+        const isValid = bcrypt.compare(password,hash);
+
+        return isValid;
+    } catch(err){
+        console.log(err);
+    }
+}
+
+
+async function getUserId(email){
+    try{
+        const client = await pool.connect();
+        const query = 'SELECT user_id FROM users WHERE email_id = $1';
+        const values = [email];
+        const result = await client.query(query, values)
+
+        console.log(result);
+
+        return result.rows[0].user_id;
+
+        client.release();
+    } catch(err){
+        console.log(err);
+    }
+}
+
 
 module.exports = {
     checkUnique,
-    insertUser
+    insertUser,
+    isValidCredentials,
+    getUserId
 }
 
 
