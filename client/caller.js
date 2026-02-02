@@ -3,6 +3,7 @@ const alertBox = document.querySelector('.alert');
 const makeCall = document.getElementById('MakeCall');
 const endCall = document.getElementById('EndCall');
 let timerInterval;
+let sid;
 
 const iti = window.intlTelInput(input, {
   initialCountry: "us",
@@ -75,10 +76,6 @@ try{
         throw 'please enter a number';
     }
 
-
-    
-
-
     const res = await fetch('http://localhost:3000/makecall',{
         method: "POST",
         headers: {
@@ -120,8 +117,6 @@ try{
             endCall.disabled = false;
             eventSource.close();
         }
-
-        
             
     }
 
@@ -136,7 +131,9 @@ try{
 
     console.log(resp);
 
-    const sid = resp.callsid;
+    sid = resp.callsid;
+
+    console.log(sid);
 
    
 
@@ -147,7 +144,34 @@ try{
     
 
 
-    endCall.addEventListener('click',async (event) => {
+    
+
+
+
+    
+
+} catch(err){
+    showAlert(err,'error');
+    makeCall.disabled = false;
+    endCall.disabled = false;
+    eventSource.close();
+}
+    
+})
+
+
+
+endCall.addEventListener('click', async(event) => {
+
+
+    try{
+
+        console.log(sid);
+
+        if(!sid){
+            throw "no active call to end";
+        }
+
         endCall.disabled = true;
         const res = await fetch('http://localhost:3000/endcall', {
             method: "PUT",
@@ -164,18 +188,16 @@ try{
             throw resp.error;
         }
 
+        sid=undefined;
+
+
+
+    } catch(err){
+        showAlert(err,'error');
+        makeCall.disabled = false;
+        endCall.disabled = false;
         
-    })
+    }
 
 
-
-    
-
-} catch(err){
-    showAlert(err,'error');
-    makeCall.disabled = false;
-    endCall.disabled = false;
-    eventSource.close();
-}
-    
 })
