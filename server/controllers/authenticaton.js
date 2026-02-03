@@ -57,17 +57,20 @@ const createAccountHandler = async (req, res, next) => {
 
     if(checkForUniqueEmail){
         await insertUser(email,password);
-    }
 
-    else {
         return res.json({
-            status:'user already exists'
+            message: 'Please Log In',
+
         })
     }
 
-    // res.redirect('/login');
 
-    return res.send(); // first signup will happen then the user will be redirected to the login page and when the 
+    return res.json({
+        message:'User already exists'
+    })
+
+    
+    // first signup will happen then the user will be redirected to the login page and when the 
     //user enters his email and password , we verify its credentials and then we create a jwt token and send him to the dialer
 
 
@@ -100,8 +103,12 @@ const createJWTHandler = async (req, res) => {
 }
 
 const isValidCredentialsHandler = async (req, res, next) => {
+    
     const email = req.body.Email;
     const password = req.body.Password;
+
+    console.log(email);
+    console.log(password);
 
     const isValid = await isValidCredentials(email,password);
 
