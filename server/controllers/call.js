@@ -127,7 +127,7 @@ const statusCallbackEventHandler = async (req, res) => {
 
     }
 
-    else await updateCallDB(sid, status, duration, timestamp);
+    else await updateCallDB(sid, status, duration);
 
 
 

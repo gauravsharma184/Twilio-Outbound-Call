@@ -33,21 +33,21 @@ async function insertCallDB(sid, to, status){
 }
 
 
-async function updateCallDB(sid, status,duration = null,timestamp = null) {
+async function updateCallDB(sid, status,duration = null) {
     try{
 
         const client = await pool.connect();
         const query = `
         
             UPDATE CALL_LOGS 
-            SET STATUS = $1, DURATION = $2, TIMESTAMP = $3
-            WHERE SID = $4;
+            SET STATUS = $1, DURATION = $2, call_timestamp = NOW()
+            WHERE SID = $3;
         
         
         
         `;
 
-        const values = [status, duration,timestamp, sid];
+        const values = [status, duration, sid];
 
         const result = await client.query(query, values);
 
