@@ -115,6 +115,7 @@ const isValidCredentialsHandler = async (req, res, next) => {
     if(!isValid){
         return res.json({
             message: "Invalid Credentials",
+            status:'error'
         })
     }
 

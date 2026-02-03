@@ -67,7 +67,7 @@ app.put('/endcall',endcallHandler)
 
 app.post('/createaccount',createAccountHandler);
 
-app.get('/authenticate',isValidCredentialsHandler,createJWTHandler);
+app.post('/authenticate',isValidCredentialsHandler,createJWTHandler);
 
 
 

@@ -93,7 +93,7 @@ async function getUserId(email){
         const values = [email];
         const result = await client.query(query, values)
 
-        console.log(result);
+        // console.log(result);
 
         client.release();
 
