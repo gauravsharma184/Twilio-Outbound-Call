@@ -1,0 +1,88 @@
+/* Reset & sane defaults */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Page center */
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f3f4f6;
+}
+
+/* Card container */
+.container {
+  width: 320px;
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+.container p {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Input groups */
+#email_container,
+#password_container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+/* Labels */
+label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #374151;
+}
+
+/* Inputs */
+input {
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  outline: none;
+}
+
+/* Input focus */
+input:focus {
+  border-color: #2563eb;
+}
+
+/* Button container */
+.function {
+  margin-top: 10px;
+}
+
+/* Button */
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: bold;
+  color: white;
+  background-color: #2563eb;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Button hover */
+button:hover {
+  background-color: #1d4ed8;
+}
