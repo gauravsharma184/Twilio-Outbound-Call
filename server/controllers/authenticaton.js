@@ -116,6 +116,19 @@ const isValidCredentialsHandler = async (req, res, next) => {
 }
 
 
+const verifyJWTtokenHandler = async(req, res, next) => {
+    console.log(req.headers);
+    const token = "" // will get from the front end
+    jwt.verify(token,process.env.JWT_SYMMETRIC_KEY, function(err, decoded) {
+        console.log(decoded);
+
+        if(err){
+            console.log(err);
+        }
+    })
+}
+
+
 
 
 
@@ -125,7 +138,8 @@ module.exports = {
     validEmailHandler,
     createAccountHandler,
     createJWTHandler,
-    isValidCredentialsHandler
+    isValidCredentialsHandler,
+    verifyJWTtokenHandler
 }
 
 
