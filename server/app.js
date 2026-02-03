@@ -31,10 +31,22 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
-app.use(express.static(path.join(__dirname,'../client')));
+app.use(express.static(path.join(__dirname,'../client/dialer')));
+app.use(express.static(path.join(__dirname,'../client/login')));
+app.use(express.static(path.join(__dirname,'../client/signup')))
+
+console.log(__dirname);
 
 app.get('/',(req, res) => {
-    return res.sendFile(path.join(__dirname,'../client','caller.html'));
+    return res.sendFile(path.join(__dirname,'../client','/dialer/caller.html'));
+})
+
+app.get('/login',(req, res) => {
+    return res.sendFile(path.join(__dirname,'../client','/login/login.html'));
+})
+
+app.get('/signup',(req, res) => {
+    return res.sendFile(path.join(__dirname,'../client','/signup/signup.html'));
 })
 
 
@@ -53,9 +65,11 @@ app.post('/makecall',validPhoneNumberHandler, createCallHandler);
 app.put('/endcall',endcallHandler)
 
 
-app.post('/signup',createAccountHandler);
+app.post('/createaccount',createAccountHandler);
 
-app.get('/login',isValidCredentialsHandler,createJWTHandler);
+app.get('/authenticate',isValidCredentialsHandler,createJWTHandler);
+
+
 
 
 
