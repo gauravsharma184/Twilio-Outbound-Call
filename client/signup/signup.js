@@ -21,6 +21,10 @@ const signUpListener = async (event) => {
     try{
         const email = emailInput.value;
         const password = passwordInput.value;
+
+        if(!email || !password){
+            throw 'please fill your credentials';
+        }
         const newUser = {
             Email:email,
             Password:password
@@ -36,9 +40,9 @@ const signUpListener = async (event) => {
 
         const response = await res.json(); // I got a response object
 
-        console.log(response);
-
-        showAlert(response.message);
+        await fetch('http://localhost:3000/login',{ // if the account has been created we show the user the login page
+            method: "GET",
+        })
 
         signUpButton.disabled = false;
 

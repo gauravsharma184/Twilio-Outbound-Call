@@ -60,6 +60,7 @@ const createAccountHandler = async (req, res, next) => {
 
         return res.json({
             message: 'Please Log In',
+            
 
         })
     }
@@ -67,6 +68,7 @@ const createAccountHandler = async (req, res, next) => {
 
     return res.json({
         message:'User already exists'
+
     })
 
     
@@ -88,18 +90,20 @@ const createJWTHandler = async (req, res) => {
     const config = {
         expiresIn : 60 * 60,
     }
-    jwt.sign(payload,key,config,function(err, token) {
-        if(err){
-            return res.status(500).send(err.name);
-        }
-        console.log(token);
-        return res.json({
-            status: "success",
-            message: "authenticaiton successful",
-            token: token,
-            user_id: id
-        })
+     const token = jwt.sign(payload,key,config); //it should be synchronous
+
+     res.cookie('access_token',token,{
+        maxAge: 8 * 3600000,
+        signed:true
+    });
+
+    res.cookie('id',id);
+
+    res.json({
+        status:'ok'
     })
+   
+        
 }
 
 const isValidCredentialsHandler = async (req, res, next) => {
@@ -115,7 +119,8 @@ const isValidCredentialsHandler = async (req, res, next) => {
     if(!isValid){
         return res.json({
             message: "Invalid Credentials",
-            status:'error'
+            status:'error',
+            flag: false
         })
     }
 

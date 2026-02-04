@@ -1,7 +1,7 @@
 
 
 const express = require('express');
-
+require('dotenv').config();
 const cors = require('cors');
 
 const { createCallHandler, statusCallbackEventHandler, endcallHandler,validPhoneNumberHandler,eventHandler } = require('./controllers/call.js');
@@ -16,6 +16,9 @@ const bodyParser = require('body-parser')
 
 const path = require('path');
 
+const cookieParser = require('cookie-parser')
+
+
 
 
 
@@ -27,6 +30,7 @@ const path = require('path');
 
 
 app.use(cors());
+app.use(cookieParser(process.env.JWT_SYMMETRIC_KEY))
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());

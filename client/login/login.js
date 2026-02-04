@@ -18,9 +18,13 @@ function showAlert(message, type='info'){
 const logInListener = async (event) => {
     logInButton.disabled = true;
 
+
     try{
         const email = emailInput.value;
         const password = passwordInput.value;
+        if(!email || !password){
+            throw 'please fill your credentials';
+        }
         const newUser = {
             Email:email,
             Password:password
@@ -34,14 +38,11 @@ const logInListener = async (event) => {
             body: JSON.stringify(newUser)
         })
 
-        const response = await res.json(); // I got a response object
+       console.log(res);
 
-        console.log(response);
+       logInButton.disabled = false;
 
-        showAlert(response.message);
-
-        logInButton.disabled = false;
-
+        
         
     } catch(err){
         showAlert(err,'error');
