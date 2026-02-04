@@ -97,7 +97,7 @@ async function getCallLogs(user_id){
         const client = await pool.connect();
         const query = `
         
-            SELECT SID,OUTBOUND_NUMBER,STATUS,CALL_TIMESTAMP,DURATION FROM CALL_LOGS WHERE user_id = $1;
+            SELECT SID,OUTBOUND_NUMBER,STATUS,CALL_TIMESTAMP,DURATION FROM CALL_LOGS WHERE user_id = $1 ORDER BY call_timestamp DESC;
         
         
         `;

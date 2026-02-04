@@ -200,6 +200,8 @@ const endcallHandler = async (req, res) => {
 const getCallLogsHandler = async (req, res) => {
     console.log('Signed Cookies: ', req.signedCookies)
 
+    const id = req.cookies.id;
+
     // console.log(id);
 
     const logs = await getCallLogs(id);
