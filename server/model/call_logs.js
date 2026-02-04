@@ -8,20 +8,20 @@ const pool = new Pool({
 
 
 
-async function insertCallDB(sid, to, status){
+async function insertCallDB(sid, to, status, id){
     try{
 
         const client = await pool.connect();
         const query = `
         
-            INSERT INTO CALL_LOGS(SID,OUTBOUND_NUMBER,STATUS)
-            VALUES($1, $2, $3);
+            INSERT INTO CALL_LOGS(SID,OUTBOUND_NUMBER,STATUS,user_id)
+            VALUES($1, $2, $3,$4);
         
         
         
         `;
 
-        const values = [sid, to, status];
+        const values = [sid, to, status, id];
 
         const result = await client.query(query, values);
 
@@ -91,13 +91,79 @@ async function getSidDB(sid) {
 }
 
 
+async function getCallLogs(user_id){
+    try{
+
+        const client = await pool.connect();
+        const query = `
+        
+            SELECT SID,OUTBOUND_NUMBER,STATUS,CALL_TIMESTAMP,DURATION FROM CALL_LOGS WHERE user_id = $1;
+        
+        
+        `;
+
+        const values = [user_id];
+
+        const result = await client.query(query, values);
+
+
+
+        client.release();
+
+        // console.log(result);
+
+        return result.rows;
+
+        
+        
+
+    } catch(err){
+        console.log(err);
+    }
+}
+
+
+async function getUserIdFromDataBase(sid){
+    try{
+
+        const client = await pool.connect();
+        const query = `
+        
+            SELECT user_id FROM CALL_LOGS WHERE SID = $1;
+        
+        
+        `;
+
+        const values = [sid];
+
+        const result = await client.query(query, values);
+
+
+
+        client.release();
+
+        // console.log(result);
+
+        return result.rows[0];
+
+        
+        
+
+    } catch(err){
+        console.log(err);
+    }
+}
+
+
 
 
 
 module.exports = {
     insertCallDB,
     updateCallDB,
-    getSidDB
+    getSidDB,
+    getCallLogs,
+    getUserIdFromDataBase
 }
 
 

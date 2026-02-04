@@ -94,7 +94,8 @@ const createJWTHandler = async (req, res) => {
 
      res.cookie('access_token',token,{
         maxAge: 8 * 3600000,
-        signed:true
+        signed:true,
+        
     });
 
     res.cookie('id',id);

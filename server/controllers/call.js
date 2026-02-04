@@ -14,7 +14,7 @@ const client = twilio(accountSid, authToken);
 const bodyParser = require('body-parser');
 
 
-const { insertCallDB, updateCallDB, getSidDB } = require('../model/call_logs.js');
+const { insertCallDB, updateCallDB, getSidDB, getCallLogs, getUserIdFromDataBase} = require('../model/call_logs.js');
 
 
 const validPhoneNumberHandler = async (req, res, next) => {
@@ -36,6 +36,9 @@ const validPhoneNumberHandler = async (req, res, next) => {
 
 const createCallHandler = (req, res) => {
     const phoneNumber = req.body.phoneNumber;
+    console.log(req.signedCookies);
+    console.log(req.cookies);
+    const id = req.cookies.id;
 
     try {
 
@@ -51,7 +54,7 @@ const createCallHandler = (req, res) => {
             });
 
             console.log(call.sid);
-            console.log(call.status);
+            await insertCallDB(call.sid, phoneNumber, call.status,id);
 
             return res.json({
                 callsid: call.sid
@@ -80,11 +83,16 @@ const eventHandler = (req, res) => {
     res.setHeader('Connection', 'keep-alive');
 
     res.write('connected to the server');
+    const id = req.cookies.id;
+    const client = {
+        id:id,
+        res:res
+    }
 
-    clients.push(res); // store the responses in the arrays
+    clients.push(client); // store the responses in the arrays
 
     req.on('close',() => {
-        clients = clients.filter((client) => client !==  res);
+        clients = clients.filter((client) => client.res !==  res);
         res.end();
     })
 
@@ -106,29 +114,36 @@ const statusCallbackEventHandler = async (req, res) => {
     const phoneNumber = req.query.To;
 
     console.log(status);
-    console.log(sid);
-    console.log(duration);
-    console.log(timestamp);
+    // console.log(sid);
+    // console.log(duration);
+    // console.log(timestamp);
+    
 
+    
+    const user = await getUserIdFromDataBase(sid);
+    const id = user.user_id;
+
+
+    const client = clients.find((client) => client.id == id);
+    client.res.write(`data: ${status}\n\n`);
+
+    
     
 
 
-    clients.forEach((client) => {
-        // console.log(client);
+    await updateCallDB(sid, status, duration);
+
+
+   
+
+   
+
         
-        client.write(`data: ${status}\n\n`);
-    })
 
 
-    if (status === 'initiated') {
+    
 
-        await insertCallDB(sid, phoneNumber, status);
-
-
-    }
-
-    else await updateCallDB(sid, status, duration);
-
+     
 
 
 
@@ -182,6 +197,23 @@ const endcallHandler = async (req, res) => {
 }
 
 
+const getCallLogsHandler = async (req, res) => {
+    console.log('Signed Cookies: ', req.signedCookies)
+
+    // console.log(id);
+
+    const logs = await getCallLogs(id);
+
+    return res.json(logs);
+}
+
+
+
+const concurrentCallCheckerHandler = async (req, res) => {
+
+}
+
+
 
 
 
@@ -190,7 +222,8 @@ module.exports = {
     statusCallbackEventHandler,
     endcallHandler,
     validPhoneNumberHandler,
-    eventHandler
+    eventHandler,
+    getCallLogsHandler
     
 }
 

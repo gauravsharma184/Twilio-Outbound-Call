@@ -78,8 +78,10 @@ try{
 
     const res = await fetch('http://localhost:3000/makecall',{
         method: "POST",
+        credentials: "include",
         headers: {
             'Content-Type': 'application/json',
+
           },
         body: JSON.stringify({phoneNumber: phoneNumber})
     })
@@ -88,7 +90,7 @@ try{
         
         console.log(event);
         if(event.data === 'ringing'){
-            showAlert(event.data,'success');
+            showAlert('ringing','success');
         }
 
         else if(event.data === 'in-progress'){
@@ -175,6 +177,7 @@ endCall.addEventListener('click', async(event) => {
         endCall.disabled = true;
         const res = await fetch('http://localhost:3000/endcall', {
             method: "PUT",
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
             },

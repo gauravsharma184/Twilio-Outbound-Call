@@ -40,9 +40,7 @@ const signUpListener = async (event) => {
 
         const response = await res.json(); // I got a response object
 
-        await fetch('http://localhost:3000/login',{ // if the account has been created we show the user the login page
-            method: "GET",
-        })
+        window.location.href = 'http://localhost:3000/login';
 
         signUpButton.disabled = false;
 

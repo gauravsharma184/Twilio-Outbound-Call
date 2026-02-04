@@ -42,6 +42,8 @@ const logInListener = async (event) => {
 
        logInButton.disabled = false;
 
+       window.location.href = 'http://localhost:3000';
+
         
         
     } catch(err){
