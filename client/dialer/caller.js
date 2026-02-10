@@ -2,6 +2,7 @@ const input = document.querySelector("#phone");
 const alertBox = document.querySelector('.alert');
 const makeCall = document.getElementById('MakeCall');
 const endCall = document.getElementById('EndCall');
+const callLogs = document.getElementById('callLogs');
 let timerInterval;
 let sid;
 
@@ -203,4 +204,9 @@ endCall.addEventListener('click', async(event) => {
     }
 
 
+})
+
+
+callLogs.addEventListener('click',() => {
+    window.location.href = 'http://localhost:3000/logs';
 })

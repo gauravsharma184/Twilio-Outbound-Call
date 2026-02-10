@@ -6,13 +6,13 @@ const cors = require('cors');
 
 const { createCallHandler, statusCallbackEventHandler, endcallHandler,validPhoneNumberHandler,eventHandler,getCallLogsHandler,deleteCallLogHandler } = require('./controllers/call.js');
 
-const {validEmailHandler,createAccountHandler,isValidCredentialsHandler,createJWTHandler,} = require('./controllers/authenticaton.js')
+const {validEmailHandler,createAccountHandler,isValidCredentialsHandler,createJWTHandler,} = require('./controllers/authenticaton.js');
 
 const app = express();
 
 const PORT = 3000;
 
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 
 const path = require('path');
 

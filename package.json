@@ -24,5 +24,10 @@
     "nodemon": "^3.1.11",
     "pg": "^8.17.2",
     "twilio": "^5.11.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0"
   }
 }
