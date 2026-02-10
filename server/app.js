@@ -41,6 +41,9 @@ app.use(bodyParser.urlencoded());
 app.use(express.static(path.join(__dirname,'../client/dialer')));
 app.use(express.static(path.join(__dirname,'../client/login')));
 app.use(express.static(path.join(__dirname,'../client/signup')));
+app.use(express.static(path.join(__dirname,'../client/call_logs')));
+
+
 
 console.log(__dirname);
 
@@ -55,6 +58,12 @@ app.get('/login',(req, res) => {
 app.get('/signup',(req, res) => {
     return res.sendFile(path.join(__dirname,'../client','/signup/signup.html'));
 })
+
+app.get('/logs',(req, res) => {
+    return res.sendFile(path.join(__dirname,'../client','/call_logs/call_logs.html'));
+})
+
+
 
 
 app.get('/events',eventHandler)
