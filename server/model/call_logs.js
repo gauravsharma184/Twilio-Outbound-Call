@@ -97,7 +97,9 @@ async function getCallLogs(user_id){
         const client = await pool.connect();
         const query = `
         
-            SELECT SID,OUTBOUND_NUMBER,STATUS,CALL_TIMESTAMP,DURATION FROM CALL_LOGS WHERE user_id = $1 ORDER BY call_timestamp DESC;
+            SELECT SID,OUTBOUND_NUMBER,STATUS,CALL_TIMESTAMP,DURATION FROM CALL_LOGS
+            WHERE user_id = $1 AND is_deleted = false
+             ORDER BY call_timestamp DESC;
         
         
         `;
@@ -154,6 +156,31 @@ async function getUserIdFromDataBase(sid){
     }
 }
 
+async function deleteCallLogFromDB(sid){
+    try{
+        const client = await pool.connect();
+        const query = `
+        
+            UPDATE CALL_LOGS 
+            SET is_deleted = $1
+            WHERE SID = $2;
+        
+        
+        `;
+
+        const values = [true,sid];
+
+        const result = await client.query(query, values);
+
+
+
+        client.release();
+
+    } catch(err){
+        console.log(err);
+    }
+}
+
 
 
 
@@ -164,7 +191,8 @@ module.exports = {
     updateCallDB,
     getSidDB,
     getCallLogs,
-    getUserIdFromDataBase
+    getUserIdFromDataBase,
+    deleteCallLogFromDB
 }
 
 

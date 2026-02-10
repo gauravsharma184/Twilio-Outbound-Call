@@ -1,4 +1,6 @@
 const table = document.querySelector('#CallLogs');
+const tableHeaders = document.querySelector('#CallLogs thead tr');
+const tableBody = document.querySelector('#CallLogs tbody')
 
 async function getData(){
     try{
@@ -27,21 +29,21 @@ async function getData(){
 
 
 async function createTable(data){
-    const tableHeaders = document.querySelector('#CallLogs thead tr');
-    const tableBody = document.querySelector('#CallLogs tbody')
-    const headers = Object.keys(data[0]);
-    headers.push('action');
-    console.log(headers);
+    
+    
+   
 
     //created the column
-
-    headers.forEach((head) => {
-        const column = document.createElement('th');
-        column.textContent = head;
-        console.log(column);
-        tableHeaders.appendChild(column);
-
+    const headers = Object.keys(data[0]);
+    console.log(headers);
+    headers.push('action');
+    headers.forEach((column) => {
+        const header = document.createElement('th');
+        header.textContent = column;
+        tableHeaders.appendChild(header);
     })
+
+    
 
     //inserting the rows
     data.forEach((obj) => {
@@ -71,23 +73,52 @@ async function createTable(data){
 }
 
 
-table.addEventListener('click',({target}) => {
-    const row = target.closest('tr');
-    console.log(row);
+const deleteCallLog = async (event) => {
+    console.log(event);
+    const button = event.target;
+    const row = button.closest('tr');
+    const sid = row.cells[0].textContent;
+    tableBody.removeChild(row);
+    const apiEndPoint =  'http://localhost:3000/api/deletecallLog';
+    const options = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
 
-    const cells = row.cells;
-
-   
-
-    const sid = cells[0].textContent;
-
-    console.log(sid);
+          },
+        body: JSON.stringify({sid: sid})
+    }
 
     
-})
+
+    const res = await fetch(apiEndPoint,options);
+
+    const data = await res.json();
+    console.log(data);
+}
+
+
+const listener = () => {
+    const button = document.querySelectorAll('button');
+    console.log(button);
+    button.forEach((button) => {
+        button.addEventListener('click',deleteCallLog);
+    })
+}
+
+
+getData().then(listener);
 
 
 
 
 
-getData();
+
+
+
+
+
+
+
+
+

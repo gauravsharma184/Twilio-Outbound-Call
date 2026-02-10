@@ -14,7 +14,7 @@ const client = twilio(accountSid, authToken);
 const bodyParser = require('body-parser');
 
 
-const { insertCallDB, updateCallDB, getSidDB, getCallLogs, getUserIdFromDataBase} = require('../model/call_logs.js');
+const { insertCallDB, updateCallDB, getSidDB, getCallLogs, getUserIdFromDataBase, deleteCallLogFromDB} = require('../model/call_logs.js');
 
 
 const validPhoneNumberHandler = async (req, res, next) => {
@@ -215,6 +215,21 @@ const concurrentCallCheckerHandler = async (req, res) => {
 
 }
 
+const deleteCallLogHandler = async(req, res) => {
+    try{
+        const sid = req.body.sid;
+
+        const result = await deleteCallLogFromDB(sid);
+
+        return res.json({
+            message: 'call log deleted successfully'
+        })
+
+    } catch(err){
+        console.log(err);
+    }    
+}
+
 
 
 
@@ -225,7 +240,8 @@ module.exports = {
     endcallHandler,
     validPhoneNumberHandler,
     eventHandler,
-    getCallLogsHandler
+    getCallLogsHandler,
+    deleteCallLogHandler
     
 }
 
