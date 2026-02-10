@@ -64,7 +64,7 @@ input.addEventListener('keypress', (event) => {
 })
 
 
-makeCall.addEventListener('click', async (event) => {
+makeCall.addEventListener('click', async () => {
     alertBox.style.display = 'none';
     makeCall.disabled = true;
     const phoneNumber = iti.getNumber();
@@ -164,7 +164,7 @@ try{
 
 
 
-endCall.addEventListener('click', async(event) => {
+endCall.addEventListener('click', async() => {
 
 
     try{
