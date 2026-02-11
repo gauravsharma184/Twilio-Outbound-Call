@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ngrok/ngrok": "^1.7.0",
+    "@twilio/voice-sdk": "^2.18.0",
     "axios": "^1.13.4",
     "bcrypt": "^6.0.0",
     "body": "^5.1.0",
