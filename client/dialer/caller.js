@@ -1,10 +1,26 @@
+
+
+
+
+
+
+
 const input = document.querySelector("#phone");
 const alertBox = document.querySelector('.alert');
 const makeCall = document.getElementById('MakeCall');
 const endCall = document.getElementById('EndCall');
 const callLogs = document.getElementById('callLogs');
+
+
+
+
 let timerInterval;
 let sid;
+let token;
+let device;
+let call;
+
+
 
 const iti = window.intlTelInput(input, {
   initialCountry: "us",
@@ -63,89 +79,58 @@ input.addEventListener('keypress', (event) => {
 
 })
 
+async function getToken(){
+    try{
+        const tokenEndPoint = 'http://localhost:3000/token';
+        const tokenOptions = {
+            method:'GET'
+        }
+
+        const res = await fetch(tokenEndPoint,tokenOptions);
+
+        if(!res.ok){
+            throw new Error(`Error http status ${res.status}`);
+        }
+
+        const data = await res.json();
+        token = data.token;
+        device = new Twilio.Device(token, {debug : true});
+    } catch(err){
+        console.log(err);
+    }
+
+    
+
+}
+
 
 makeCall.addEventListener('click', async () => {
     alertBox.style.display = 'none';
-    makeCall.disabled = true;
+    // makeCall.disabled = true;
     const phoneNumber = iti.getNumber();
     console.log(phoneNumber);
     console.log(typeof phoneNumber);
-    const eventSource = new EventSource('http://localhost:3000/events');
+    
 try{
     
     if(!phoneNumber){
         throw 'please enter a number';
     }
 
-    const res = await fetch('http://localhost:3000/makecall',{
-        method: "POST",
-        credentials: "include",
-        headers: {
-            'Content-Type': 'application/json',
+    
+    
 
-          },
-        body: JSON.stringify({phoneNumber: phoneNumber})
-    })
+     console.log(device);
 
-    eventSource.onmessage = function(event) {
-        
-        console.log(event);
-        if(event.data === 'ringing'){
-            showAlert('ringing','success');
+    const options = {
+        params:{
+            To: phoneNumber
         }
-
-        else if(event.data === 'in-progress'){
-            let startTime = Date.now();
-            
-            timerInterval = setInterval(updateTime,1000,startTime);
-
-            
-
-
-        }
-
-        else if(event.data === 'completed'){
-            clearInterval(timerInterval);
-            alertBox.style.display = 'none';
-            makeCall.disabled = false;
-            endCall.disabled = false;
-            eventSource.close();
-            
-        }
-
-        else{
-            clearInterval(timerInterval);
-            showAlert(event.data,'error');
-            makeCall.disabled = false;
-            endCall.disabled = false;
-            eventSource.close();
-        }
-            
     }
 
-
-    
-
-
-
-    
-
-    const resp = await res.json();
-
-    console.log(resp);
-
-    sid = resp.callsid;
-
-    console.log(sid);
-
-   
-
-    if(resp.error){
-        throw resp.error;
-    }
-
-    
-
+     call = await device.connect(options);
+    console.log(call);
+      
 
     
 
@@ -154,11 +139,10 @@ try{
     
 
 } catch(err){
-    showAlert(err,'error');
-    makeCall.disabled = false;
-    endCall.disabled = false;
-    eventSource.close();
+    console.log(err);
 }
+
+
     
 })
 
@@ -169,38 +153,8 @@ endCall.addEventListener('click', async() => {
 
     try{
 
-        console.log(sid);
-
-        if(!sid){
-            throw "no active call to end";
-        }
-
-        endCall.disabled = true;
-        const res = await fetch('http://localhost:3000/endcall', {
-            method: "PUT",
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-
-            body: JSON.stringify({callSid: sid})
-        })
-
-        const resp = await res.json();
-
-        if(resp.error){
-            throw resp.error;
-        }
-
-        sid=undefined;
-
-
-
     } catch(err){
-        showAlert(err,'error');
-        makeCall.disabled = false;
-        endCall.disabled = false;
-        
+        console.log(err);
     }
 
 
@@ -210,3 +164,9 @@ endCall.addEventListener('click', async() => {
 callLogs.addEventListener('click',() => {
     window.location.href = 'http://localhost:3000/logs';
 })
+
+
+getToken();
+
+
+

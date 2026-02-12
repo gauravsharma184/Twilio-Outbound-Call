@@ -4,7 +4,7 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 
-const {generateTokenHandler,getCallLogsHandler,deleteCallLogHandler, callHandler } = require('./controllers/call.js');
+const {generateTokenHandler,getCallLogsHandler,deleteCallLogHandler, callHandler, eventHandler } = require('./controllers/call.js');
 
 const {validEmailHandler,createAccountHandler,isValidCredentialsHandler,createJWTHandler,} = require('./controllers/authenticaton.js');
 
@@ -77,6 +77,8 @@ app.get('/logs',(req, res) => {
 app.get('/token',generateTokenHandler)
 
 app.post('/callhandler',callHandler);
+
+app.post('/events',eventHandler);
 
 app.post('/createaccount',createAccountHandler);
 

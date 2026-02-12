@@ -32,6 +32,9 @@ const generateTokenHandler = async (req, res) => {
     );
     token.addGrant(voiceGrant);
 
+
+    // console.log(token);
+
     // Serialize the token to a JWT string
     // console.log(token.toJwt());
 
@@ -69,26 +72,50 @@ const deleteCallLogHandler = async(req, res) => {
     }    
 }
 
+const eventHandler = (req, res) => {
+    console.log(req.body); //data is in the body
+
+    return res.send();
+}
+
 
 const callHandler = async (req, res) => {
+    // creating a twilio response which will be sent to twilio when it hit my call handler end point when device.connect(params) is executed
     const VoiceResponse = require('twilio').twiml.VoiceResponse;
     const callerId = process.env.TWILIO_PHONE_NUMBER;
-    const phoneNumber = req.body.TO;
+    console.log(req);
+    const phoneNumber = req.body.To;
+    console.log(req.body);
+
+    console.log(phoneNumber);
+
+    const option = {
+        statusCallbackEvent: 'initiated ringing answered completed',
+        statusCallback: 'https://nominatively-atomistic-lacresha.ngrok-free.dev/events',
+        statusCallbackMethod: 'POST'
+    }
+
+
+    
 
 
 
     if(phoneNumber){
         const response = new VoiceResponse();
         const dial = response.dial({
+            
             callerId: callerId
         });
-        dial.number(phoneNumber);
+       
+        dial.number(option,phoneNumber);
+        res.set('Content-Type', 'text/xml');
+        console.log(response.toString());
+        res.send(response.toString());
 
         // console.log(response.toString());
     }
 
-    res.set('Content-Type', 'text/xml');
-    res.send(response.toString());
+    
 }
 
 
@@ -97,5 +124,6 @@ module.exports = {
     generateTokenHandler,
     getCallLogsHandler,
     deleteCallLogHandler,
-    callHandler
+    callHandler,
+    eventHandler
 }
