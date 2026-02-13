@@ -80,7 +80,7 @@ app.post('/callhandler',callHandler);
 
 app.post('/events',eventHandler);
 
-app.get('/events',sendEventsHandler)
+app.get('/sendevents',sendEventsHandler)
 
 app.post('/createaccount',createAccountHandler);
 

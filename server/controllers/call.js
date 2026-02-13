@@ -4,7 +4,7 @@ require('dotenv').config();
 const AccessToken = require('twilio').jwt.AccessToken;
 const VoiceGrant = AccessToken.VoiceGrant;
 const bcrypt = require('bcrypt');
-const { insertParentCallDB, insertChildCallDB, updateCallDB } = require('../model/call_logs');
+const { insertParentCallDB, insertChildCallDB, updateCallDB, getUserIdFromDataBase } = require('../model/call_logs');
 const saltRounds = 10;
 
 
@@ -86,6 +86,12 @@ const eventHandler = async (req, res) => {
     const from = data.From;
     const to = data.To;
     const duration = data.Duration;
+    const user = await getUserIdFromDataBase(parentCallSid);
+    const userId = user.user_id;
+
+    const client = clients.find((client) => client.id == userId);
+    client.res.write(`data: ${status}\n\n`);
+
 
     console.log(status);
 

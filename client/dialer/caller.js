@@ -113,6 +113,7 @@ makeCall.addEventListener('click', async () => {
     const phoneNumber = iti.getNumber();
     console.log(phoneNumber);
     console.log(typeof phoneNumber);
+    const eventSource = new EventSource('http://localhost:3000/sendevents');
     
 try{
     
@@ -134,6 +135,43 @@ try{
     call = await device.connect(options); //twilio hits my voice endpoint with the parameters //this is the parent call that I make to twilio
 
     console.log(call);
+
+
+    eventSource.onmessage = function(event) {
+        
+        console.log(event);
+        if(event.data === 'ringing'){
+            showAlert('ringing','success');
+        }
+
+        else if(event.data === 'in-progress'){
+            let startTime = Date.now();
+            
+            timerInterval = setInterval(updateTime,1000,startTime);
+
+            
+
+
+        }
+
+        else if(event.data === 'completed'){
+            clearInterval(timerInterval);
+            alertBox.style.display = 'none';
+            makeCall.disabled = false;
+            endCall.disabled = false;
+            eventSource.close();
+            
+        }
+
+        else{
+            clearInterval(timerInterval);
+            showAlert(event.data,'error');
+            makeCall.disabled = false;
+            endCall.disabled = false;
+            eventSource.close();
+        }
+            
+    }
     
     
 
@@ -142,7 +180,8 @@ try{
     
 
 } catch(err){
-    console.log(err);
+   showAlert(err,'error');
+   makeCall.disabled=false;
 }
 
 
@@ -151,16 +190,16 @@ try{
 
 
 
-endCall.addEventListener('click', async() => {
-
+endCall.addEventListener('click', async () => {
+    console.log('endcall was clicked');
+    endCall.disabled = true;
 
     try{
-
+        await device.disconnectAll();
+        endCall.disabled = false;
     } catch(err){
         console.log(err);
     }
-
-
 })
 
 

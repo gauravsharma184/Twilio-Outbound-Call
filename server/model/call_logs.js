@@ -160,7 +160,7 @@ async function getUserIdFromDataBase(sid){
         const client = await pool.connect();
         const query = `
         
-            SELECT user_id FROM CALL_LOGS WHERE SID = $1;
+            SELECT user_id FROM parent_call WHERE parent_call_sid = $1;
         
         
         `;
@@ -224,6 +224,17 @@ module.exports = {
     getUserIdFromDataBase,
     deleteCallLogFromDB
 }
+
+
+
+
+
+//  getUserIdFromDataBase('CAef1c8bd93dec36a1ed8f98a649a540f1')
+//  .then((result) => {
+//     console.log(result);
+//  })
+
+
 
 
 
