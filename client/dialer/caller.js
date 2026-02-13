@@ -197,6 +197,7 @@ endCall.addEventListener('click', async () => {
     try{
         await device.disconnectAll();
         endCall.disabled = false;
+        makeCall.disabled = false;
     } catch(err){
         console.log(err);
     }
