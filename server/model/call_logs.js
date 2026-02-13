@@ -8,20 +8,20 @@ const pool = new Pool({
 
 
 
-async function insertCallDB(sid, to, status, id){
+async function insertParentCallDB(sid,id){
     try{
 
         const client = await pool.connect();
         const query = `
         
-            INSERT INTO CALL_LOGS(SID,OUTBOUND_NUMBER,STATUS,user_id)
-            VALUES($1, $2, $3,$4);
+            INSERT INTO parent_call(Parent_call_sid,User_id)
+            VALUES($1, $2);
         
         
         
         `;
 
-        const values = [sid, to, status, id];
+        const values = [sid,id];
 
         const result = await client.query(query, values);
 
@@ -33,23 +33,52 @@ async function insertCallDB(sid, to, status, id){
 }
 
 
-async function updateCallDB(sid, status,duration = null) {
+async function insertChildCallDB(child_sid,parent_sid,status,from,to,duration=0,direction){
     try{
 
         const client = await pool.connect();
         const query = `
         
-            UPDATE CALL_LOGS 
-            SET STATUS = $1, DURATION = $2, call_timestamp = NOW()
-            WHERE SID = $3;
+            INSERT INTO child_call(child_call_sid,parent_call_sid,status,direction,"From","To",duration,call_timestamp)
+            VALUES($1, $2, $3, $4, $5, $6, $7, NOW());
         
         
         
         `;
 
-        const values = [status, duration, sid];
+        const values = [child_sid,parent_sid,status,direction,from,to,duration];
 
         const result = await client.query(query, values);
+
+        client.release();
+
+    } catch(err){
+        console.log(err);
+    }
+}
+
+
+
+
+async function updateCallDB(sid, status,duration = 0) {
+    try{
+        console.log(sid);
+        const client = await pool.connect();
+        const query = `
+        
+            UPDATE child_call
+            SET status = $1, duration = $2
+            WHERE child_call_sid = $3;
+        
+        
+        
+        `;
+
+        const values = [status,duration,sid];
+
+        const result = await client.query(query, values);
+
+        // console.log(result.rows);
 
         client.release();
 
@@ -187,7 +216,8 @@ async function deleteCallLogFromDB(sid){
 
 
 module.exports = {
-    insertCallDB,
+    insertChildCallDB,
+    insertParentCallDB,
     updateCallDB,
     getSidDB,
     getCallLogs,

@@ -4,6 +4,7 @@ require('dotenv').config();
 const AccessToken = require('twilio').jwt.AccessToken;
 const VoiceGrant = AccessToken.VoiceGrant;
 const bcrypt = require('bcrypt');
+const { insertParentCallDB, insertChildCallDB, updateCallDB } = require('../model/call_logs');
 const saltRounds = 10;
 
 
@@ -76,9 +77,30 @@ const deleteCallLogHandler = async(req, res) => {
     }    
 }
 
-const eventHandler = (req, res) => {
-    console.log(req); //data is in the body
+const eventHandler = async (req, res) => {
+    const data = req.body;
+    const parentCallSid = data.ParentCallSid;
+    const direction = data.Direction;
+    const childCallSid = data.CallSid;
+    const status = data.CallStatus;
+    const from = data.From;
+    const to = data.To;
+    const duration = data.Duration;
 
+    console.log(status);
+
+    if(status === 'initiated'){
+        await insertChildCallDB(childCallSid,parentCallSid,status,from,to,duration,direction);
+    }
+
+    else if(status === 'completed'){
+         await updateCallDB(childCallSid,status,duration);
+    }
+    else{
+        await updateCallDB(childCallSid,status);
+    }
+
+    
     return res.send();
 }
 
@@ -114,11 +136,19 @@ const callHandler = async (req, res) => {
     console.log(req);
     const phoneNumber = req.body.To;
     console.log(req.body);
+    const callerString = (req.body.Caller.split(':'));
+    let idString = callerString[1];
+    
+    const idInt = Number(idString);
+    const parentCallSid = req.body.CallSid;
+
+
+    await insertParentCallDB(parentCallSid,idInt);
 
     console.log(phoneNumber);
 
     const option = {
-        statusCallbackEvent: 'completed',
+        statusCallbackEvent: 'initiated ringing answered completed',
         statusCallback: 'https://nominatively-atomistic-lacresha.ngrok-free.dev/events',
         statusCallbackMethod: 'POST'
     }

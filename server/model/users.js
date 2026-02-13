@@ -51,8 +51,8 @@ async function insertUser(email, password){
         
         `;
 
-        const hash = await bcrypt.hash(password,saltRounds);
-        const values = [email, hash];
+        const password_hash = await bcrypt.hash(password,saltRounds);
+        const values = [email, password_hash];
         const result = await client.query(query, values);
         client.release();
     } catch(err){

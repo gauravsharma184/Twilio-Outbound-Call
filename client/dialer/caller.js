@@ -131,7 +131,7 @@ try{
         }
     }
 
-    call = await device.connect(options); //twilio hits my voice endpoint with the parameters
+    call = await device.connect(options); //twilio hits my voice endpoint with the parameters //this is the parent call that I make to twilio
 
     console.log(call);
     
