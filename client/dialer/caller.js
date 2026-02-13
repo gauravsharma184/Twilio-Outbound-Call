@@ -95,6 +95,9 @@ async function getToken(){
         const data = await res.json();
         token = data.token;
         device = new Twilio.Device(token, {debug : true});
+        console.log(device);
+        
+
     } catch(err){
         console.log(err);
     }
@@ -106,7 +109,7 @@ async function getToken(){
 
 makeCall.addEventListener('click', async () => {
     alertBox.style.display = 'none';
-    // makeCall.disabled = true;
+    makeCall.disabled = true;
     const phoneNumber = iti.getNumber();
     console.log(phoneNumber);
     console.log(typeof phoneNumber);
@@ -120,7 +123,7 @@ try{
     
     
 
-     console.log(device);
+     
 
     const options = {
         params:{
@@ -128,10 +131,10 @@ try{
         }
     }
 
-     call = await device.connect(options);
-    console.log(call);
-      
+    call = await device.connect(options); //twilio hits my voice endpoint with the parameters
 
+    console.log(call);
+    
     
 
 
@@ -166,7 +169,17 @@ callLogs.addEventListener('click',() => {
 })
 
 
-getToken();
+
+getToken()
+
+
+
+
+
+
+
+
+
 
 
 

@@ -3,6 +3,8 @@ const { response } = require('express');
 require('dotenv').config();
 const AccessToken = require('twilio').jwt.AccessToken;
 const VoiceGrant = AccessToken.VoiceGrant;
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 
 // Used when generating any kind of tokens
@@ -11,10 +13,12 @@ const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
 const twilioApiKey = process.env.TWILIO_API_KEY;
 const twilioApiSecret = process.env.TWILIO_API_SECRET;
 
+let clients = [];
+
 const generateTokenHandler = async (req, res) => {
     // Used specifically for creating Voice tokens
     const outgoingApplicationSid = process.env.TWIML_APP_SID;
-    const identity = process.env.TWILIO_PHONE_NUMBER;
+    const identity = req.cookies.id;
 
     // Create a "grant" which enables a client to use Voice as a given user
     const voiceGrant = new VoiceGrant({
@@ -73,9 +77,33 @@ const deleteCallLogHandler = async(req, res) => {
 }
 
 const eventHandler = (req, res) => {
-    console.log(req.body); //data is in the body
+    console.log(req); //data is in the body
 
     return res.send();
+}
+
+
+const sendEventsHandler = (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    res.write('connected to the server');
+    const id = req.cookies.id;
+    const client = {
+        id:id,
+        res:res
+    }
+
+    clients.push(client); // store the responses in the arrays
+
+    req.on('close',() => {
+        clients = clients.filter((client) => client.res !==  res);
+        res.end();
+    })
+
+
+
 }
 
 
@@ -90,7 +118,7 @@ const callHandler = async (req, res) => {
     console.log(phoneNumber);
 
     const option = {
-        statusCallbackEvent: 'initiated ringing answered completed',
+        statusCallbackEvent: 'completed',
         statusCallback: 'https://nominatively-atomistic-lacresha.ngrok-free.dev/events',
         statusCallbackMethod: 'POST'
     }
@@ -125,5 +153,6 @@ module.exports = {
     getCallLogsHandler,
     deleteCallLogHandler,
     callHandler,
-    eventHandler
+    eventHandler,
+    sendEventsHandler
 }
