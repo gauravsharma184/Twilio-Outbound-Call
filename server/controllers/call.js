@@ -90,7 +90,9 @@ const eventHandler = async (req, res) => {
     const userId = user.user_id;
 
     const client = clients.find((client) => client.id == userId);
-    client.res.write(`data: ${status}\n\n`);
+    // const check = client.res;
+    
+     if(client && client.res) client.res.write(`data: ${status}\n\n`);
 
 
     console.log(status);
@@ -159,8 +161,6 @@ const callHandler = async (req, res) => {
         statusCallbackMethod: 'POST'
     }
 
-
-    
 
 
 

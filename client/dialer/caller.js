@@ -94,7 +94,11 @@ async function getToken(){
 
         const data = await res.json();
         token = data.token;
-        device = new Twilio.Device(token, {debug : true});
+        const options = {
+            closeProtection: true,
+            debug:true
+        }
+        device = new Twilio.Device(token, options);
         console.log(device);
         
 
@@ -160,7 +164,7 @@ try{
             makeCall.disabled = false;
             endCall.disabled = false;
             eventSource.close();
-            
+            call = undefined;
         }
 
         else{
@@ -196,8 +200,7 @@ endCall.addEventListener('click', async () => {
 
     try{
         await device.disconnectAll();
-        endCall.disabled = false;
-        makeCall.disabled = false;
+        
     } catch(err){
         console.log(err);
     }
@@ -206,6 +209,15 @@ endCall.addEventListener('click', async () => {
 
 callLogs.addEventListener('click',() => {
     window.location.href = 'http://localhost:3000/logs';
+})
+
+
+window.addEventListener("beforeunload", (event) => {
+    console.log(event);
+    if(call){
+        event.preventDefault();
+        
+    }
 })
 
 

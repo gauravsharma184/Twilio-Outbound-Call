@@ -229,17 +229,5 @@ module.exports = {
 
 
 
-//  getUserIdFromDataBase('CAef1c8bd93dec36a1ed8f98a649a540f1')
-//  .then((result) => {
-//     console.log(result);
-//  })
-
-
-
-
-
-
-
-
 
 
