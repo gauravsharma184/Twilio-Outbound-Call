@@ -33,20 +33,20 @@ async function insertParentCallDB(sid,id){
 }
 
 
-async function insertChildCallDB(child_sid,parent_sid,status,from,to,duration=0,direction){
+async function insertChildCallDB(child_sid,parent_sid,status,from,to,duration=0,direction=null,conferenceSid,user_id){
     try{
 
         const client = await pool.connect();
         const query = `
         
-            INSERT INTO child_call(child_call_sid,parent_call_sid,status,direction,"From","To",duration,call_timestamp)
-            VALUES($1, $2, $3, $4, $5, $6, $7, NOW());
+            INSERT INTO child_call(child_call_sid,parent_call_sid,status,direction,"From","To",duration,call_timestamp,user_id,conference_call_sid)
+            VALUES($1, $2, $3, $4, $5, $6, $7, NOW(),$8,$9);
         
         
         
         `;
 
-        const values = [child_sid,parent_sid,status,direction,from,to,duration];
+        const values = [child_sid,parent_sid,status,direction,from,to,duration,user_id,conferenceSid];
 
         const result = await client.query(query, values);
 
@@ -160,7 +160,7 @@ async function getUserIdFromDataBase(sid){
         const client = await pool.connect();
         const query = `
         
-            SELECT user_id FROM parent_call WHERE parent_call_sid = $1;
+            SELECT user_id FROM child_call WHERE child_call_sid = $1;
         
         
         `;
@@ -210,6 +210,32 @@ async function deleteCallLogFromDB(sid){
     }
 }
 
+async function getCallSidAndConferenceSidfromDB(user_id){
+    try{
+        const client = await pool.connect();
+        const query = `
+        
+            SELECT child_call_sid,conference_call_sid
+            FROM child_call
+            WHERE user_id = $1 AND status = 'in-progress';
+        
+        
+        `;
+
+        const values = [user_id];
+
+        const result = await client.query(query, values);
+
+        return result.rows[0];
+
+
+
+        client.release();
+
+    } catch(err){
+        console.log(err);
+    }
+}
 
 
 
@@ -222,12 +248,6 @@ module.exports = {
     getSidDB,
     getCallLogs,
     getUserIdFromDataBase,
-    deleteCallLogFromDB
+    deleteCallLogFromDB,
+    getCallSidAndConferenceSidfromDB
 }
-
-
-
-
-
-
-

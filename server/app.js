@@ -4,7 +4,7 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 
-const {generateTokenHandler,getCallLogsHandler,deleteCallLogHandler, callHandler, eventHandler, sendEventsHandler } = require('./controllers/call.js');
+const {generateTokenHandler,getCallLogsHandler,deleteCallLogHandler, callHandler, eventHandler, sendEventsHandler, holdHandler, validPhoneNumberHandler } = require('./controllers/call.js');
 
 const {validEmailHandler,createAccountHandler,isValidCredentialsHandler,createJWTHandler,} = require('./controllers/authenticaton.js');
 
@@ -90,6 +90,8 @@ app.get('/callLogs',getCallLogsHandler);
 
 app.put('/api/deletecallLog',deleteCallLogHandler);
 
+app.put('/hold',holdHandler)
+
 
 
 
@@ -112,9 +114,3 @@ app.put('/api/deletecallLog',deleteCallLogHandler);
 
 
 app.listen(PORT, () => console.log('server running at 3000'));
-
-
-
-
-
-

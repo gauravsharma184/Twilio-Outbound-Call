@@ -4,7 +4,7 @@ require('dotenv').config();
 const AccessToken = require('twilio').jwt.AccessToken;
 const VoiceGrant = AccessToken.VoiceGrant;
 const bcrypt = require('bcrypt');
-const { insertParentCallDB, insertChildCallDB, updateCallDB, getUserIdFromDataBase } = require('../model/call_logs');
+const { insertParentCallDB, insertChildCallDB, updateCallDB, getUserIdFromDataBase, getCallSidAndConferenceSidfromDB } = require('../model/call_logs');
 const saltRounds = 10;
 
 
@@ -13,8 +13,15 @@ const saltRounds = 10;
 const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
 const twilioApiKey = process.env.TWILIO_API_KEY;
 const twilioApiSecret = process.env.TWILIO_API_SECRET;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+const twilio = require('twilio');
+
+const client = twilio(twilioAccountSid,authToken);
 
 let clients = [];
+
+
 
 const generateTokenHandler = async (req, res) => {
     // Used specifically for creating Voice tokens
@@ -78,30 +85,49 @@ const deleteCallLogHandler = async(req, res) => {
 }
 
 const eventHandler = async (req, res) => {
+
+    // console.log(req.body);
     const data = req.body;
-    const parentCallSid = data.ParentCallSid;
+    // const parentCallSid = data.ParentCallSid;
     const direction = data.Direction;
     const childCallSid = data.CallSid;
     const status = data.CallStatus;
     const from = data.From;
     const to = data.To;
-    const duration = data.Duration;
-    const user = await getUserIdFromDataBase(parentCallSid);
+    const duration = data.CallDuration;
+    //get the id from the db to send events to the client
+    const user = await getUserIdFromDataBase(childCallSid);
     const userId = user.user_id;
 
-    const client = clients.find((client) => client.id == userId);
-    // const check = client.res;
     
-     if(client && client.res) client.res.write(`data: ${status}\n\n`);
+    // const check = client.res;
+
+    const event = {
+        status: status,
+        childCallSid:childCallSid
+    }
+
+    console.log(event);
+
+    const eventJSON = JSON.stringify(event);
+
+    
+    const client = clients.find((client) => client.id == userId);
+     if(client && client.res && status !== 'initiated'){
+        console.log('sending event');
+        client.res.write(`data:${eventJSON}\n\n`);
+     }
 
 
     console.log(status);
 
-    if(status === 'initiated'){
-        await insertChildCallDB(childCallSid,parentCallSid,status,from,to,duration,direction);
-    }
+    
 
-    else if(status === 'completed'){
+    // if(status === 'initiated'){
+    //     await insertChildCallDB(childCallSid,parentCallSid,status,from,to,duration,direction);
+    // }
+
+     if(status === 'completed'){
          await updateCallDB(childCallSid,status,duration);
     }
     else{
@@ -117,8 +143,9 @@ const sendEventsHandler = (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Content-Encoding', 'none');
 
-    res.write('connected to the server');
+    res.write('connected to the server\n\n');
     const id = req.cookies.id;
     const client = {
         id:id,
@@ -143,23 +170,65 @@ const callHandler = async (req, res) => {
     const callerId = process.env.TWILIO_PHONE_NUMBER;
     console.log(req);
     const phoneNumber = req.body.To;
-    console.log(req.body);
+    // console.log(req.body);
     const callerString = (req.body.Caller.split(':'));
     let idString = callerString[1];
     
     const idInt = Number(idString);
-    const parentCallSid = req.body.CallSid;
+    const parentCallSid = req.body.CallSid;// what is this?? // this is the parent call sid of my inbound call to twilio
+    console.log(parentCallSid);
 
 
-    await insertParentCallDB(parentCallSid,idInt);
+    // await insertParentCallDB(parentCallSid,idInt);
 
     console.log(phoneNumber);
 
-    const option = {
-        statusCallbackEvent: 'initiated ringing answered completed',
-        statusCallback: 'https://nominatively-atomistic-lacresha.ngrok-free.dev/events',
-        statusCallbackMethod: 'POST'
+
+    
+
+    
+
+    
+
+    //post request to add the callee to the to the conference
+
+    const participant = await client
+    .conferences(parentCallSid)
+    .participants.create({
+      
+      
+      from: callerId,
+      
+      statusCallback: "https://nominatively-atomistic-lacresha.ngrok-free.dev/events",
+      statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
+      statusCallbackMethod: "POST",
+      to: phoneNumber,
+      endConferenceOnExit:true
+    });
+
+    // await insertChildCallDB(participant.callSid,parentCallSid);
+
+    
+    console.log(participant.conferenceSid);
+    console.log(participant.callSid); //what is this?? // this is the sid of my outbound call// can use this to insert into my database
+
+    //sending call sid to the user
+
+    const event = {
+        status: 'queued',
+        childCallSid:participant.callSid,
+        conferenceSid: participant.conferenceSid
     }
+
+    const eventJSON = JSON.stringify(event);
+
+    const user = clients.find((client) => client.id == idInt);
+     if(user && user.res){
+        console.log('sending event');
+        user.res.write(`data:${eventJSON}\n\n`);
+     }
+
+    await insertChildCallDB(participant.callSid,parentCallSid,'queued',callerId,phoneNumber,0,'outbound',participant.conferenceSid,idInt);
 
 
 
@@ -171,15 +240,66 @@ const callHandler = async (req, res) => {
             callerId: callerId
         });
        
-        dial.number(option,phoneNumber);
+        dial.conference({startConferenceOnEnter: true,endConferenceOnExit:true}, parentCallSid); 
         res.set('Content-Type', 'text/xml');
         console.log(response.toString());
         res.send(response.toString());
 
-        // console.log(response.toString());
+       
     }
 
     
+}
+
+
+const holdHandler = async(req, res) => {
+    // a client will be available on a single call, hold should be available in-progress only can get the user id from the db
+    // const result = await getCallSidAndConferenceSidfromDB(req.cookies.id);
+    // console.log(result);
+
+    console.log(req.body);
+    const conferenceSid = req.body.conferenceSid;
+    const childCallSid = req.body.childCallSid;
+
+    if(req.body.flag){
+        const participant = await client
+        .conferences(conferenceSid)
+        .participants(childCallSid)
+        .update({
+        hold: true,
+        });
+
+    }
+
+    else{
+        const participant = await client
+        .conferences(conferenceSid)
+        .participants(childCallSid)
+        .update({
+        hold: false,
+        });
+    }
+
+    return res.json({
+        hold: 'successful'
+    })
+}
+
+const validPhoneNumberHandler = async (req, res, next) => {
+    const number = req.body.To;
+    const phoneNumber = await client.lookups.v2
+        .phoneNumbers(number)
+        .fetch();
+
+
+
+    if (!(phoneNumber.valid)) {
+        return res.status(400).send({
+            error: 'Invalid Number'
+        })
+    }
+
+    next();
 }
 
 
@@ -190,5 +310,9 @@ module.exports = {
     deleteCallLogHandler,
     callHandler,
     eventHandler,
-    sendEventsHandler
+    sendEventsHandler,
+    holdHandler,
+    validPhoneNumberHandler
+    
+    
 }

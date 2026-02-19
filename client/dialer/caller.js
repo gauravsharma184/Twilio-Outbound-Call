@@ -8,8 +8,12 @@
 const input = document.querySelector("#phone");
 const alertBox = document.querySelector('.alert');
 const makeCall = document.getElementById('MakeCall');
+const makeCallBox = document.querySelector('.function_make_call');
 const endCall = document.getElementById('EndCall');
+const holdCall = document.getElementById('Hold');
+const muteCall = document.getElementById('Mute');
 const callLogs = document.getElementById('callLogs');
+const endCallBox = document.querySelector('.function_end_call');
 
 
 
@@ -19,6 +23,9 @@ let sid;
 let token;
 let device;
 let call;
+let holdFlag = true;
+let childCallSid;
+let conferenceSid;
 
 
 
@@ -58,7 +65,7 @@ const reg = new RegExp(expression);
 input.addEventListener('keypress', (event) => {
     
 
-    console.log(event.key);
+    // console.log(event.key);
 
     const check = reg.test(event.key);
 
@@ -112,11 +119,12 @@ async function getToken(){
 
 
 makeCall.addEventListener('click', async () => {
+    childCallSid = undefined;
+    conferenceSid = undefined;
     alertBox.style.display = 'none';
     makeCall.disabled = true;
     const phoneNumber = iti.getNumber();
-    console.log(phoneNumber);
-    console.log(typeof phoneNumber);
+    console.log("phoneNumber",phoneNumber);
     const eventSource = new EventSource('http://localhost:3000/sendevents');
     
 try{
@@ -144,35 +152,79 @@ try{
     eventSource.onmessage = function(event) {
         
         console.log(event);
-        if(event.data === 'ringing'){
+
+        const data = JSON.parse(event.data);
+        console.log(data);
+        console.log(data.status);
+
+        if(data.status === 'queued'){
+            conferenceSid = data.conferenceSid;
+            console.log("conferenceSid",conferenceSid)
+            return;
+        }
+        
+        if(data.status === 'ringing'){
+            //show alert to the client
+
             showAlert('ringing','success');
+            childCallSid = data.childCallSid;
+
+            //show the endcall box and hide the make call box
+            endCallBox.style.display = 'block';
+            makeCall.style.display = 'none';
         }
 
-        else if(event.data === 'in-progress'){
+        else if(data.status === 'in-progress'){
+            holdCall.disabled = false;
             let startTime = Date.now();
             
             timerInterval = setInterval(updateTime,1000,startTime);
 
-            
-
-
         }
 
-        else if(event.data === 'completed'){
-            clearInterval(timerInterval);
+        else if(data.status === 'completed'){
             alertBox.style.display = 'none';
+            clearInterval(timerInterval); // clear the interval when the status is completed
+
+            //make the make call button able and the hold call button disabled
             makeCall.disabled = false;
+            holdCall.disabled=true;
             endCall.disabled = false;
-            eventSource.close();
-            call = undefined;
+
+            //make the endcallbox display to none
+
+            endCallBox.style.display = 'none';
+            makeCall.style.display = 'block';
+
+           //closing the connection
+
+           eventSource.close();
+
+            
         }
 
         else{
-            clearInterval(timerInterval);
-            showAlert(event.data,'error');
+            
+            clearInterval(timerInterval); // clear the interval when the status is completed
+            showAlert(data.status,'error');
+
+            //make the make call button able and the hold call button disabled
             makeCall.disabled = false;
+            holdCall.disabled=true;
             endCall.disabled = false;
+
+
+            //make the endcallbox display to none and show the make call
+
+            endCallBox.style.display = 'none';
+            makeCall.style.display = 'block';
+
+            //closing the connection
+
             eventSource.close();
+
+
+            
         }
             
     }
@@ -200,10 +252,55 @@ endCall.addEventListener('click', async () => {
 
     try{
         await device.disconnectAll();
+       
         
     } catch(err){
         console.log(err);
     }
+})
+
+holdCall.addEventListener('click',async (event) => {
+    try{
+        const holdEndPoint = 'http://localhost:3000/hold';
+        const options = {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json',
+
+            },
+            body: JSON.stringify({
+                flag: holdFlag,
+                childCallSid: childCallSid,
+                conferenceSid:conferenceSid
+
+            })
+        }
+
+        const res = await fetch(holdEndPoint,options);
+
+        if(!res.ok){
+            throw new Error(`Error http status ${res.status}`);
+        }
+        
+        const data = await res.json();
+
+        if(data.hold === 'successful'){
+            
+            if(holdFlag){
+                holdCall.textContent = 'resume';
+            }
+
+            else holdCall.textContent = 'hold';
+
+            holdFlag = !(holdFlag);
+
+        }
+    } catch(err){
+        console.log(err);
+    }
+
+
+
 })
 
 
@@ -212,26 +309,14 @@ callLogs.addEventListener('click',() => {
 })
 
 
-window.addEventListener("beforeunload", (event) => {
-    console.log(event);
-    if(call){
-        event.preventDefault();
+// window.addEventListener("beforeunload", (event) => {
+//     console.log(event);
+//     if(call){
+//         event.preventDefault();
         
-    }
-})
+//     }
+// })
 
 
 
 getToken()
-
-
-
-
-
-
-
-
-
-
-
-
