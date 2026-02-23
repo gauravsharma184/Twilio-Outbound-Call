@@ -74,27 +74,36 @@ async function createTable(data){
 
 
 const deleteCallLog = async (event) => {
-    console.log(event);
-    const button = event.target;
-    const row = button.closest('tr');
-    const sid = row.cells[0].textContent;
-    tableBody.removeChild(row);
-    const apiEndPoint =  'http://localhost:3000/api/deletecallLog';
-    const options = {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
+    try{
+        console.log(event);
+        const button = event.target;
+        const row = button.closest('tr');
+        const sid = row.cells[0].textContent;
+        
+        const apiEndPoint =  'http://localhost:3000/api/deletecallLog';
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
 
-          },
-        body: JSON.stringify({sid: sid})
+            },
+            body: JSON.stringify({sid: sid})
+        }
+
+        tableBody.removeChild(row);
+
+        
+
+        const res = await fetch(apiEndPoint,options);
+        if(!res.ok) {
+            throw new Error(`HTTP status error ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log(data);
+    } catch(err){
+        console.log(err);
     }
-
-    
-
-    const res = await fetch(apiEndPoint,options);
-
-    const data = await res.json();
-    console.log(data);
 }
 
 

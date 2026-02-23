@@ -4,7 +4,7 @@ require('dotenv').config();
 const AccessToken = require('twilio').jwt.AccessToken;
 const VoiceGrant = AccessToken.VoiceGrant;
 const bcrypt = require('bcrypt');
-const { insertParentCallDB, insertChildCallDB, updateCallDB, getUserIdFromDataBase, getCallSidAndConferenceSidfromDB } = require('../model/call_logs');
+const { insertParentCallDB, insertChildCallDB, updateCallDB, getUserIdFromDataBase, getCallSidAndConferenceSidfromDB, getCallLogs, deleteCallLogFromDB } = require('../model/call_logs');
 const saltRounds = 10;
 
 

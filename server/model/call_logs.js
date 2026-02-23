@@ -126,9 +126,9 @@ async function getCallLogs(user_id){
         const client = await pool.connect();
         const query = `
         
-            SELECT SID,OUTBOUND_NUMBER,STATUS,CALL_TIMESTAMP,DURATION FROM CALL_LOGS
+            SELECT parent_call_sid,"From","To",call_timestamp,duration,status FROM child_call
             WHERE user_id = $1 AND is_deleted = false
-             ORDER BY call_timestamp DESC;
+            ORDER BY call_timestamp DESC;
         
         
         `;
@@ -190,9 +190,9 @@ async function deleteCallLogFromDB(sid){
         const client = await pool.connect();
         const query = `
         
-            UPDATE CALL_LOGS 
+            UPDATE child_call 
             SET is_deleted = $1
-            WHERE SID = $2;
+            WHERE parent_call_sid = $2;
         
         
         `;
