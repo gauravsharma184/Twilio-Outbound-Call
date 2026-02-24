@@ -51,8 +51,6 @@ app.get('/signup', (req, res) => {
 app.get('/logs', (req, res) => {
     return res.sendFile(path.join(__dirname, '../client', '/call_logs/call_logs.html'));
 })
-
-
 app.get('/token', generateTokenHandler)
 
 app.post('/callhandler', callHandler);
@@ -70,26 +68,5 @@ app.get('/callLogs', getCallLogsHandler);
 app.put('/api/deletecallLog', deleteCallLogHandler);
 
 app.put('/hold', holdHandler)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 app.listen(PORT, () => console.log('server running at 3000'));
