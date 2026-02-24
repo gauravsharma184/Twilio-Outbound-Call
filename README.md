@@ -44,6 +44,16 @@ docker images
 ```console
 docker run -p host-port:container-port image-name:tag
 ```
+6. Run  ngrok using docker
+- For Windows or Mac
+```console
+docker run -it -e NGROK_AUTHTOKEN=xyz ngrok/ngrok:latest http host.docker.internal:<port>
+```
+- For Linux
+```console
+docker run --net=host -it -e NGROK_AUTHTOKEN=xyz ngrok/ngrok:latest http <port>
+```
+
 
 
 
