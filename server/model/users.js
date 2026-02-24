@@ -1,4 +1,4 @@
-const {Pool} = require('pg');
+const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
@@ -12,7 +12,7 @@ const saltRounds = 10;
 
 
 async function checkUnique(email) {
-    try{
+    try {
         const client = await pool.connect();
 
         const query = 'SELECT COUNT(*) AS COUNT FROM users WHERE email_id = $1';
@@ -29,21 +29,21 @@ async function checkUnique(email) {
 
         return numberOfRows === 0;
 
-        
-
-        
 
 
-    } catch(err) {
+
+
+
+    } catch (err) {
         console.log(err);
     }
 }
 
 
-async function insertUser(email, password){
-    try{
+async function insertUser(email, password) {
+    try {
         const client = await pool.connect();
-        
+
 
         const query = `
             INSERT INTO users(email_id, password)
@@ -51,17 +51,17 @@ async function insertUser(email, password){
         
         `;
 
-        const password_hash = await bcrypt.hash(password,saltRounds);
+        const password_hash = await bcrypt.hash(password, saltRounds);
         const values = [email, password_hash];
         const result = await client.query(query, values);
         client.release();
-    } catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
 
-async function isValidCredentials(email,password){
-    try{
+async function isValidCredentials(email, password) {
+    try {
         const client = await pool.connect();
         const query = 'SELECT * FROM users WHERE email_id = $1';
         const values = [email];
@@ -74,20 +74,20 @@ async function isValidCredentials(email,password){
         const hash = result.rows[0].password;
 
         console.log(hash);
-        
 
 
-        const isValid = bcrypt.compare(password,hash);
+
+        const isValid = bcrypt.compare(password, hash);
 
         return isValid;
-    } catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
 
 
-async function getUserId(email){
-    try{
+async function getUserId(email) {
+    try {
         const client = await pool.connect();
         const query = 'SELECT user_id FROM users WHERE email_id = $1';
         const values = [email];
@@ -99,8 +99,8 @@ async function getUserId(email){
 
         return result.rows[0].user_id;
 
-        
-    } catch(err){
+
+    } catch (err) {
         console.log(err);
     }
 }

@@ -5,12 +5,12 @@ const logInButton = document.getElementById('LogIn');
 
 
 
-function showAlert(message, type='info'){
+function showAlert(message, type = 'info') {
     alertBox.className = `alert alert-${type}`;
     alertBox.style.display = 'block';
-    
+
     alertBox.textContent = message;
-    
+
 }
 
 
@@ -19,18 +19,18 @@ const logInListener = async (event) => {
     logInButton.disabled = true;
 
 
-    try{
+    try {
         const email = emailInput.value;
         const password = passwordInput.value;
-        if(!email || !password){
+        if (!email || !password) {
             throw 'please fill your credentials';
         }
         const newUser = {
-            Email:email,
-            Password:password
+            Email: email,
+            Password: password
         }
 
-        const res = await fetch('http://localhost:3000/authenticate',{
+        const res = await fetch('http://localhost:3000/authenticate', {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -38,29 +38,29 @@ const logInListener = async (event) => {
             body: JSON.stringify(newUser)
         })
 
-       console.log(res);
+        console.log(res);
 
-       logInButton.disabled = false;
+        logInButton.disabled = false;
 
-       window.location.href = 'http://localhost:3000';
+        window.location.href = 'http://localhost:3000';
 
-        
-        
-    } catch(err){
-        showAlert(err,'error');
+
+
+    } catch (err) {
+        showAlert(err, 'error');
     }
 
 
 
 
-    
+
 
 }
 
 
 
 
-logInButton.addEventListener('click',logInListener);
+logInButton.addEventListener('click', logInListener);
 
 
 

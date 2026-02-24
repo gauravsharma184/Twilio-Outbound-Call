@@ -15,8 +15,8 @@ const validEmailHandler = async (req, res, next) => {
 
     const params = new URLSearchParams();
 
-    params.append('secret',secret);
-    params.append('email',email);
+    params.append('secret', secret);
+    params.append('email', email);
 
     const queryString = params.toString();
 
@@ -24,13 +24,13 @@ const validEmailHandler = async (req, res, next) => {
 
     const finalURL = `${baseURL}?${queryString}`;
 
-    try{
+    try {
 
         const response = await axios.get(finalURL);
 
         console.log(response.data);
 
-        if(response.data === 'ok'){
+        if (response.data === 'ok') {
             next();
         }
 
@@ -38,13 +38,13 @@ const validEmailHandler = async (req, res, next) => {
             status: 'invalid email',
         })
 
-    } catch(err){
+    } catch (err) {
         console.log(err);
         return res.status(400).send(err);
     }
 
 
-    
+
 
 
 }
@@ -55,23 +55,23 @@ const createAccountHandler = async (req, res, next) => {
 
     const checkForUniqueEmail = await checkUnique(email);
 
-    if(checkForUniqueEmail){
-        await insertUser(email,password);
+    if (checkForUniqueEmail) {
+        await insertUser(email, password);
 
         return res.json({
             message: 'Please Log In',
-            
+
 
         })
     }
 
 
     return res.json({
-        message:'User already exists'
+        message: 'User already exists'
 
     })
 
-    
+
     // first signup will happen then the user will be redirected to the login page and when the 
     //user enters his email and password , we verify its credentials and then we create a jwt token and send him to the dialer
 
@@ -88,39 +88,39 @@ const createJWTHandler = async (req, res) => {
     const payload = {};
     const key = process.env.JWT_SYMMETRIC_KEY;
     const config = {
-        expiresIn : 60 * 60,
+        expiresIn: 60 * 60,
     }
-     const token = jwt.sign(payload,key,config); //it should be synchronous
+    const token = jwt.sign(payload, key, config); //it should be synchronous
 
-     res.cookie('access_token',token,{
+    res.cookie('access_token', token, {
         maxAge: 8 * 3600000,
-        signed:true,
-        
+        signed: true,
+
     });
 
-    res.cookie('id',id);
+    res.cookie('id', id);
 
     res.json({
-        status:'ok'
+        status: 'ok'
     })
-   
-        
+
+
 }
 
 const isValidCredentialsHandler = async (req, res, next) => {
-    
+
     const email = req.body.Email;
     const password = req.body.Password;
 
     console.log(email);
     console.log(password);
 
-    const isValid = await isValidCredentials(email,password);
+    const isValid = await isValidCredentials(email, password);
 
-    if(!isValid){
+    if (!isValid) {
         return res.json({
             message: "Invalid Credentials",
-            status:'error',
+            status: 'error',
             flag: false
         })
     }
@@ -130,13 +130,13 @@ const isValidCredentialsHandler = async (req, res, next) => {
 }
 
 
-const verifyJWTtokenHandler = async(req, res, next) => {
+const verifyJWTtokenHandler = async (req, res, next) => {
     console.log(req.headers);
     const token = "" // will get from the front end
-    jwt.verify(token,process.env.JWT_SYMMETRIC_KEY, function(err, decoded) {
+    jwt.verify(token, process.env.JWT_SYMMETRIC_KEY, function (err, decoded) {
         console.log(decoded);
 
-        if(err){
+        if (err) {
             console.log(err);
         }
     })

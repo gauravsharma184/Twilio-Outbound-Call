@@ -5,12 +5,12 @@ const signUpButton = document.getElementById('Signup');
 
 
 
-function showAlert(message, type='info'){
+function showAlert(message, type = 'info') {
     alertBox.className = `alert alert-${type}`;
     alertBox.style.display = 'block';
-    
+
     alertBox.textContent = message;
-    
+
 }
 
 
@@ -18,19 +18,19 @@ function showAlert(message, type='info'){
 const signUpListener = async (event) => {
     signUpButton.disabled = true;
 
-    try{
+    try {
         const email = emailInput.value;
         const password = passwordInput.value;
 
-        if(!email || !password){
+        if (!email || !password) {
             throw 'please fill your credentials';
         }
         const newUser = {
-            Email:email,
-            Password:password
+            Email: email,
+            Password: password
         }
 
-        const res = await fetch('http://localhost:3000/createaccount',{
+        const res = await fetch('http://localhost:3000/createaccount', {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -44,22 +44,22 @@ const signUpListener = async (event) => {
 
         signUpButton.disabled = false;
 
-        
-    } catch(err){
-        showAlert(err,'error');
+
+    } catch (err) {
+        showAlert(err, 'error');
     }
 
 
 
 
-    
+
 
 }
 
 
 
 
-signUpButton.addEventListener('click',signUpListener);
+signUpButton.addEventListener('click', signUpListener);
 
 
 

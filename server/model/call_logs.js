@@ -1,4 +1,4 @@
-const {Pool} = require('pg');
+const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
@@ -8,8 +8,8 @@ const pool = new Pool({
 
 
 
-async function insertParentCallDB(sid,id){
-    try{
+async function insertParentCallDB(sid, id) {
+    try {
 
         const client = await pool.connect();
         const query = `
@@ -21,20 +21,20 @@ async function insertParentCallDB(sid,id){
         
         `;
 
-        const values = [sid,id];
+        const values = [sid, id];
 
         const result = await client.query(query, values);
 
         client.release();
 
-    } catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
 
 
-async function insertChildCallDB(child_sid,parent_sid,status,from,to,duration=0,direction=null,conferenceSid,user_id){
-    try{
+async function insertChildCallDB(child_sid, parent_sid, status, from, to, duration = 0, direction = null, conferenceSid, user_id) {
+    try {
 
         const client = await pool.connect();
         const query = `
@@ -46,13 +46,13 @@ async function insertChildCallDB(child_sid,parent_sid,status,from,to,duration=0,
         
         `;
 
-        const values = [child_sid,parent_sid,status,direction,from,to,duration,user_id,conferenceSid];
+        const values = [child_sid, parent_sid, status, direction, from, to, duration, user_id, conferenceSid];
 
         const result = await client.query(query, values);
 
         client.release();
 
-    } catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
@@ -60,8 +60,8 @@ async function insertChildCallDB(child_sid,parent_sid,status,from,to,duration=0,
 
 
 
-async function updateCallDB(sid, status,duration = 0) {
-    try{
+async function updateCallDB(sid, status, duration = 0) {
+    try {
         console.log(sid);
         const client = await pool.connect();
         const query = `
@@ -74,7 +74,7 @@ async function updateCallDB(sid, status,duration = 0) {
         
         `;
 
-        const values = [status,duration,sid];
+        const values = [status, duration, sid];
 
         const result = await client.query(query, values);
 
@@ -82,14 +82,14 @@ async function updateCallDB(sid, status,duration = 0) {
 
         client.release();
 
-    } catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
 
 
 async function getSidDB(sid) {
-    try{
+    try {
 
         const client = await pool.connect();
         const query = `
@@ -111,17 +111,17 @@ async function getSidDB(sid) {
 
         return result.rows[0];
 
-        
-        
 
-    } catch(err){
+
+
+    } catch (err) {
         console.log(err);
     }
 }
 
 
-async function getCallLogs(user_id){
-    try{
+async function getCallLogs(user_id) {
+    try {
 
         const client = await pool.connect();
         const query = `
@@ -145,17 +145,17 @@ async function getCallLogs(user_id){
 
         return result.rows;
 
-        
-        
 
-    } catch(err){
+
+
+    } catch (err) {
         console.log(err);
     }
 }
 
 
-async function getUserIdFromDataBase(sid){
-    try{
+async function getUserIdFromDataBase(sid) {
+    try {
 
         const client = await pool.connect();
         const query = `
@@ -177,16 +177,16 @@ async function getUserIdFromDataBase(sid){
 
         return result.rows[0];
 
-        
-        
 
-    } catch(err){
+
+
+    } catch (err) {
         console.log(err);
     }
 }
 
-async function deleteCallLogFromDB(sid){
-    try{
+async function deleteCallLogFromDB(sid) {
+    try {
         const client = await pool.connect();
         const query = `
         
@@ -197,7 +197,7 @@ async function deleteCallLogFromDB(sid){
         
         `;
 
-        const values = [true,sid];
+        const values = [true, sid];
 
         const result = await client.query(query, values);
 
@@ -205,13 +205,13 @@ async function deleteCallLogFromDB(sid){
 
         client.release();
 
-    } catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
 
-async function getCallSidAndConferenceSidfromDB(user_id){
-    try{
+async function getCallSidAndConferenceSidfromDB(user_id) {
+    try {
         const client = await pool.connect();
         const query = `
         
@@ -232,7 +232,7 @@ async function getCallSidAndConferenceSidfromDB(user_id){
 
         client.release();
 
-    } catch(err){
+    } catch (err) {
         console.log(err);
     }
 }

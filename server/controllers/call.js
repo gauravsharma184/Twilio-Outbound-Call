@@ -17,7 +17,7 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 
 const twilio = require('twilio');
 
-const client = twilio(twilioAccountSid,authToken);
+const client = twilio(twilioAccountSid, authToken);
 
 let clients = [];
 
@@ -30,17 +30,17 @@ const generateTokenHandler = async (req, res) => {
 
     // Create a "grant" which enables a client to use Voice as a given user
     const voiceGrant = new VoiceGrant({
-    outgoingApplicationSid: outgoingApplicationSid,
-    incomingAllow: true, // Optional: add to allow incoming calls
+        outgoingApplicationSid: outgoingApplicationSid,
+        incomingAllow: true, // Optional: add to allow incoming calls
     });
 
     // Create an access token which we will sign and return to the client,
     // containing the grant we just created
     const token = new AccessToken(
-    twilioAccountSid,
-    twilioApiKey,
-    twilioApiSecret,
-    {identity: identity}
+        twilioAccountSid,
+        twilioApiKey,
+        twilioApiSecret,
+        { identity: identity }
     );
     token.addGrant(voiceGrant);
 
@@ -56,7 +56,6 @@ const generateTokenHandler = async (req, res) => {
     })
 }
 
-
 const getCallLogsHandler = async (req, res) => {
     console.log('Signed Cookies: ', req.signedCookies)
 
@@ -69,8 +68,8 @@ const getCallLogsHandler = async (req, res) => {
     return res.json(logs);
 }
 
-const deleteCallLogHandler = async(req, res) => {
-    try{
+const deleteCallLogHandler = async (req, res) => {
+    try {
         const sid = req.body.sid;
 
         const result = await deleteCallLogFromDB(sid);
@@ -79,13 +78,12 @@ const deleteCallLogHandler = async(req, res) => {
             message: 'call log deleted successfully'
         })
 
-    } catch(err){
+    } catch (err) {
         console.log(err);
-    }    
+    }
 }
 
 const eventHandler = async (req, res) => {
-
     // console.log(req.body);
     const data = req.body;
     // const parentCallSid = data.ParentCallSid;
@@ -99,42 +97,37 @@ const eventHandler = async (req, res) => {
     const user = await getUserIdFromDataBase(childCallSid);
     const userId = user.user_id;
 
-    
+
     // const check = client.res;
 
     const event = {
         status: status,
-        childCallSid:childCallSid
+        childCallSid: childCallSid
     }
 
     console.log(event);
 
     const eventJSON = JSON.stringify(event);
 
-    
+
     const client = clients.find((client) => client.id == userId);
-     if(client && client.res && status !== 'initiated'){
+    if (client && client.res && status !== 'initiated') {
         console.log('sending event');
         client.res.write(`data:${eventJSON}\n\n`);
-     }
+    }
 
 
     console.log(status);
-
-    
-
     // if(status === 'initiated'){
     //     await insertChildCallDB(childCallSid,parentCallSid,status,from,to,duration,direction);
     // }
 
-     if(status === 'completed'){
-         await updateCallDB(childCallSid,status,duration);
+    if (status === 'completed') {
+        await updateCallDB(childCallSid, status, duration);
     }
-    else{
-        await updateCallDB(childCallSid,status);
+    else {
+        await updateCallDB(childCallSid, status);
     }
-
-    
     return res.send();
 }
 
@@ -148,21 +141,17 @@ const sendEventsHandler = (req, res) => {
     res.write('connected to the server\n\n');
     const id = req.cookies.id;
     const client = {
-        id:id,
-        res:res
+        id: id,
+        res: res
     }
 
     clients.push(client); // store the responses in the arrays
 
-    req.on('close',() => {
-        clients = clients.filter((client) => client.res !==  res);
+    req.on('close', () => {
+        clients = clients.filter((client) => client.res !== res);
         res.end();
     })
-
-
-
 }
-
 
 const callHandler = async (req, res) => {
     // creating a twilio response which will be sent to twilio when it hit my call handler end point when device.connect(params) is executed
@@ -173,42 +162,33 @@ const callHandler = async (req, res) => {
     // console.log(req.body);
     const callerString = (req.body.Caller.split(':'));
     let idString = callerString[1];
-    
+
     const idInt = Number(idString);
     const parentCallSid = req.body.CallSid;// what is this?? // this is the parent call sid of my inbound call to twilio
     console.log(parentCallSid);
-
-
     // await insertParentCallDB(parentCallSid,idInt);
 
     console.log(phoneNumber);
 
-
-    
-
-    
-
-    
-
     //post request to add the callee to the to the conference
 
     const participant = await client
-    .conferences(parentCallSid)
-    .participants.create({
-      
-      
-      from: callerId,
-      
-      statusCallback: "https://nominatively-atomistic-lacresha.ngrok-free.dev/events",
-      statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
-      statusCallbackMethod: "POST",
-      to: phoneNumber,
-      endConferenceOnExit:true
-    });
+        .conferences(parentCallSid)
+        .participants.create({
+
+
+            from: callerId,
+
+            statusCallback: "https://nominatively-atomistic-lacresha.ngrok-free.dev/events",
+            statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
+            statusCallbackMethod: "POST",
+            to: phoneNumber,
+            endConferenceOnExit: true
+        });
 
     // await insertChildCallDB(participant.callSid,parentCallSid);
 
-    
+
     console.log(participant.conferenceSid);
     console.log(participant.callSid); //what is this?? // this is the sid of my outbound call// can use this to insert into my database
 
@@ -216,43 +196,38 @@ const callHandler = async (req, res) => {
 
     const event = {
         status: 'queued',
-        childCallSid:participant.callSid,
+        childCallSid: participant.callSid,
         conferenceSid: participant.conferenceSid
     }
 
     const eventJSON = JSON.stringify(event);
 
     const user = clients.find((client) => client.id == idInt);
-     if(user && user.res){
+    if (user && user.res) {
         console.log('sending event');
         user.res.write(`data:${eventJSON}\n\n`);
-     }
+    }
 
-    await insertChildCallDB(participant.callSid,parentCallSid,'queued',callerId,phoneNumber,0,'outbound',participant.conferenceSid,idInt);
+    await insertChildCallDB(participant.callSid, parentCallSid, 'queued', callerId, phoneNumber, 0, 'outbound', participant.conferenceSid, idInt);
 
-
-
-
-    if(phoneNumber){
+    if (phoneNumber) {
         const response = new VoiceResponse();
         const dial = response.dial({
-            
+
             callerId: callerId
         });
-       
-        dial.conference({startConferenceOnEnter: true,endConferenceOnExit:true}, parentCallSid); 
+
+        dial.conference({ startConferenceOnEnter: true, endConferenceOnExit: true }, parentCallSid);
         res.set('Content-Type', 'text/xml');
         console.log(response.toString());
         res.send(response.toString());
 
-       
+
     }
 
-    
 }
 
-
-const holdHandler = async(req, res) => {
+const holdHandler = async (req, res) => {
     // a client will be available on a single call, hold should be available in-progress only can get the user id from the db
     // const result = await getCallSidAndConferenceSidfromDB(req.cookies.id);
     // console.log(result);
@@ -261,23 +236,23 @@ const holdHandler = async(req, res) => {
     const conferenceSid = req.body.conferenceSid;
     const childCallSid = req.body.childCallSid;
 
-    if(req.body.flag){
+    if (req.body.flag) {
         const participant = await client
-        .conferences(conferenceSid)
-        .participants(childCallSid)
-        .update({
-        hold: true,
-        });
+            .conferences(conferenceSid)
+            .participants(childCallSid)
+            .update({
+                hold: true,
+            });
 
     }
 
-    else{
+    else {
         const participant = await client
-        .conferences(conferenceSid)
-        .participants(childCallSid)
-        .update({
-        hold: false,
-        });
+            .conferences(conferenceSid)
+            .participants(childCallSid)
+            .update({
+                hold: false,
+            });
     }
 
     return res.json({
@@ -303,7 +278,6 @@ const validPhoneNumberHandler = async (req, res, next) => {
 }
 
 
-
 module.exports = {
     generateTokenHandler,
     getCallLogsHandler,
@@ -313,6 +287,6 @@ module.exports = {
     sendEventsHandler,
     holdHandler,
     validPhoneNumberHandler
-    
-    
+
+
 }
