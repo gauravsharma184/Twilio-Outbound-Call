@@ -3,7 +3,7 @@
 ## Description
 This project allows you to make an outbound call to any number using your own browser.
 
-** Built With **
+**Built With**
 - [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
 - [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
 - [Vanilla JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
