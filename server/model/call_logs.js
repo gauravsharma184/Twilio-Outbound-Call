@@ -1,4 +1,4 @@
-const {Pool} = require('pg');
+const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
@@ -8,40 +8,67 @@ const pool = new Pool({
 
 
 
-async function insertCallDB(sid, to, status, id){
-    try{
+async function insertParentCallDB(sid, id) {
+    try {
 
         const client = await pool.connect();
         const query = `
         
-            INSERT INTO CALL_LOGS(SID,OUTBOUND_NUMBER,STATUS,user_id)
-            VALUES($1, $2, $3,$4);
+            INSERT INTO parent_call(Parent_call_sid,User_id)
+            VALUES($1, $2);
         
         
         
         `;
 
-        const values = [sid, to, status, id];
+        const values = [sid, id];
 
         const result = await client.query(query, values);
 
         client.release();
 
-    } catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
 
 
-async function updateCallDB(sid, status,duration = null) {
-    try{
+async function insertChildCallDB(child_sid, parent_sid, status, from, to, duration = 0, direction = null, conferenceSid, user_id) {
+    try {
 
         const client = await pool.connect();
         const query = `
         
-            UPDATE CALL_LOGS 
-            SET STATUS = $1, DURATION = $2, call_timestamp = NOW()
-            WHERE SID = $3;
+            INSERT INTO child_call(child_call_sid,parent_call_sid,status,direction,"From","To",duration,call_timestamp,user_id,conference_call_sid)
+            VALUES($1, $2, $3, $4, $5, $6, $7, NOW(),$8,$9);
+        
+        
+        
+        `;
+
+        const values = [child_sid, parent_sid, status, direction, from, to, duration, user_id, conferenceSid];
+
+        const result = await client.query(query, values);
+
+        client.release();
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+
+
+async function updateCallDB(sid, status, duration = 0) {
+    try {
+        console.log(sid);
+        const client = await pool.connect();
+        const query = `
+        
+            UPDATE child_call
+            SET status = $1, duration = $2
+            WHERE child_call_sid = $3;
         
         
         
@@ -51,16 +78,18 @@ async function updateCallDB(sid, status,duration = null) {
 
         const result = await client.query(query, values);
 
+        // console.log(result.rows);
+
         client.release();
 
-    } catch(err){
+    } catch (err) {
         console.log(err);
     }
 }
 
 
 async function getSidDB(sid) {
-    try{
+    try {
 
         const client = await pool.connect();
         const query = `
@@ -82,24 +111,24 @@ async function getSidDB(sid) {
 
         return result.rows[0];
 
-        
-        
 
-    } catch(err){
+
+
+    } catch (err) {
         console.log(err);
     }
 }
 
 
-async function getCallLogs(user_id){
-    try{
+async function getCallLogs(user_id) {
+    try {
 
         const client = await pool.connect();
         const query = `
         
-            SELECT SID,OUTBOUND_NUMBER,STATUS,CALL_TIMESTAMP,DURATION FROM CALL_LOGS
+            SELECT parent_call_sid,"From","To",call_timestamp,duration,status FROM child_call
             WHERE user_id = $1 AND is_deleted = false
-             ORDER BY call_timestamp DESC;
+            ORDER BY call_timestamp DESC;
         
         
         `;
@@ -116,22 +145,22 @@ async function getCallLogs(user_id){
 
         return result.rows;
 
-        
-        
 
-    } catch(err){
+
+
+    } catch (err) {
         console.log(err);
     }
 }
 
 
-async function getUserIdFromDataBase(sid){
-    try{
+async function getUserIdFromDataBase(sid) {
+    try {
 
         const client = await pool.connect();
         const query = `
         
-            SELECT user_id FROM CALL_LOGS WHERE SID = $1;
+            SELECT user_id FROM child_call WHERE child_call_sid = $1;
         
         
         `;
@@ -148,27 +177,27 @@ async function getUserIdFromDataBase(sid){
 
         return result.rows[0];
 
-        
-        
 
-    } catch(err){
+
+
+    } catch (err) {
         console.log(err);
     }
 }
 
-async function deleteCallLogFromDB(sid){
-    try{
+async function deleteCallLogFromDB(sid) {
+    try {
         const client = await pool.connect();
         const query = `
         
-            UPDATE CALL_LOGS 
+            UPDATE child_call 
             SET is_deleted = $1
-            WHERE SID = $2;
+            WHERE parent_call_sid = $2;
         
         
         `;
 
-        const values = [true,sid];
+        const values = [true, sid];
 
         const result = await client.query(query, values);
 
@@ -176,7 +205,34 @@ async function deleteCallLogFromDB(sid){
 
         client.release();
 
-    } catch(err){
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function getCallSidAndConferenceSidfromDB(user_id) {
+    try {
+        const client = await pool.connect();
+        const query = `
+        
+            SELECT child_call_sid,conference_call_sid
+            FROM child_call
+            WHERE user_id = $1 AND status = 'in-progress';
+        
+        
+        `;
+
+        const values = [user_id];
+
+        const result = await client.query(query, values);
+
+        return result.rows[0];
+
+
+
+        client.release();
+
+    } catch (err) {
         console.log(err);
     }
 }
@@ -185,20 +241,13 @@ async function deleteCallLogFromDB(sid){
 
 
 
-
 module.exports = {
-    insertCallDB,
+    insertChildCallDB,
+    insertParentCallDB,
     updateCallDB,
     getSidDB,
     getCallLogs,
     getUserIdFromDataBase,
-    deleteCallLogFromDB
+    deleteCallLogFromDB,
+    getCallSidAndConferenceSidfromDB
 }
-
-
-
-
-
-
-
-

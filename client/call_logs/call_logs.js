@@ -2,8 +2,8 @@ const table = document.querySelector('#CallLogs');
 const tableHeaders = document.querySelector('#CallLogs thead tr');
 const tableBody = document.querySelector('#CallLogs tbody')
 
-async function getData(){
-    try{
+async function getData() {
+    try {
         const apiEndPoint = 'http://localhost:3000/callLogs';
         const options = {
             method: 'GET'
@@ -13,14 +13,14 @@ async function getData(){
 
         console.log(res);
 
-        if(!res.ok){
+        if (!res.ok) {
             throw new Error(`HTTP status error ${res.status}`);
         }
 
         const data = await res.json();
 
         createTable(data);
-    }catch(err){
+    } catch (err) {
         console.log(err);
     }
 
@@ -28,10 +28,10 @@ async function getData(){
 }
 
 
-async function createTable(data){
-    
-    
-   
+async function createTable(data) {
+
+
+
 
     //created the column
     const headers = Object.keys(data[0]);
@@ -43,12 +43,12 @@ async function createTable(data){
         tableHeaders.appendChild(header);
     })
 
-    
+
 
     //inserting the rows
     data.forEach((obj) => {
         const row = document.createElement('tr');
-        
+
         Object.values(obj).forEach((val) => {
             const cell = document.createElement('td');
             cell.textContent = val;
@@ -66,35 +66,44 @@ async function createTable(data){
 
 
 
-    
 
 
-    
+
+
 }
 
 
 const deleteCallLog = async (event) => {
-    console.log(event);
-    const button = event.target;
-    const row = button.closest('tr');
-    const sid = row.cells[0].textContent;
-    tableBody.removeChild(row);
-    const apiEndPoint =  'http://localhost:3000/api/deletecallLog';
-    const options = {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
+    try {
+        console.log(event);
+        const button = event.target;
+        const row = button.closest('tr');
+        const sid = row.cells[0].textContent;
 
-          },
-        body: JSON.stringify({sid: sid})
+        const apiEndPoint = 'http://localhost:3000/api/deletecallLog';
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+
+            },
+            body: JSON.stringify({ sid: sid })
+        }
+
+        tableBody.removeChild(row);
+
+
+
+        const res = await fetch(apiEndPoint, options);
+        if (!res.ok) {
+            throw new Error(`HTTP status error ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log(data);
+    } catch (err) {
+        console.log(err);
     }
-
-    
-
-    const res = await fetch(apiEndPoint,options);
-
-    const data = await res.json();
-    console.log(data);
 }
 
 
@@ -102,7 +111,7 @@ const listener = () => {
     const button = document.querySelectorAll('button');
     console.log(button);
     button.forEach((button) => {
-        button.addEventListener('click',deleteCallLog);
+        button.addEventListener('click', deleteCallLog);
     })
 }
 

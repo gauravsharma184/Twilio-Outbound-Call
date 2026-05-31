@@ -1,41 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
- <head>
-   <title>OutboundCaller</title>
-   <meta name="viewport" content="width=device-width, initial-scale=1" />
-   <link rel="stylesheet" href="styles_caller.css" />
-   <link
-     rel="stylesheet"
-     href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"
-   />
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
- </head>
- <body>
-    <div class="navigationBar">
-        <span>
-            <button id="callLogs">Call Logs</button>
-        </span>
+<head>
+  <title>OutboundCaller</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles_caller.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
-        <span>
-          <button id="LogIn">Login</button>
-        <span>
+</head>
+
+<body>
+  <div class="navigationBar">
+    <span>
+      <button id="callLogs">Call Logs</button>
+    </span>
+
+    <span>
+      <button id="LogIn">Log Out</button>
+      <span>
+
+  </div>
+  <div class="container">
+    <div id="outboundCall">
+      <p>Enter the phone number:</p>
+      <input id="phone" type="tel" name="phone" />
+
+      <div class="alert alert-info" style="display: none;"></div>
+      <div class="function_make_call">
+        <button id="MakeCall" type="button">Make Call</button>
+
+      </div>
+
+      <div class="function_end_call" style="display: none;">
+
+        <button id="Hold" type="button" disabled>Hold</button>
+        <button id="EndCall" type="button">End Call</button>
+        <!-- <button id="Mute" type="button" disabled>Mute</button> -->
+
+      </div>
 
     </div>
-    <div class="container">
-        <div id="outboundCall" >
-          <p>Enter the phone number:</p>
-          <input id="phone" type="tel" name="phone" />
+  </div>
 
-          <div class="alert alert-info" style="display: none;"></div>
-          <div class="funtion">
-            <button id="MakeCall" type="button">Make Call</button>
-            <button id="EndCall" type="button">End Call</button> 
-          </div>
-          
-        </div>
-       </div>
-       
- </body>
- <script src="caller.js"></script>
+</body>
+<script src="caller.js"></script>
+<script src="twilio.js"></script>
+
 </html>
